@@ -5,36 +5,38 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.*
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.motionEventSpy
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.recipeapp.ui.theme.Recipe
 import com.example.recipeapp.ui.theme.RecipeAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -128,43 +130,136 @@ fun CustomSearchBar() {
 @Preview (showBackground = true)
 @Composable
 fun chips() {
-    // Your implementation for the chips
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .horizontalScroll(rememberScrollState()) // Horizontal scrollable row
+    ) {
+        // Replace these with your actual category icons and labels
+        listOf("Category1", "Category2", "Category3", "More...").forEach { category ->
+            Button(onClick = { /* Handle category click */ }) {
+                Text(text = category)
+            }
+        }
+    }
 }
-@Preview (showBackground = true)
-@Composable
-fun grids() {
-    // Your implementation for the grids
-}
+
+
 
 @Preview (showBackground = true)
 @Composable
+fun grids() {
+    val recipes = listOf("Crêpe", "Spaghetti", "Biryani", "Tacos") // Example list
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2), // 2 columns
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp)
+    ) {
+        items(recipes.size) { index ->
+            // Replace with your actual recipe composable
+            RecipeCard(recipeName = recipes[index])
+        }
+    }
+}
+
+
+@Composable
+fun RecipeCard(recipeName: String) {
+    @Composable
+    fun RecipeCard(recipe: Recipe) {
+        Card(
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Placeholder for recipe image (You can replace it with an actual image)
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .background(Color.LightGray)
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = recipe.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(8.dp)
+                )
+
+                // Display time, difficulty, and calories
+                Text(
+                    text = "Time: ${recipe.time}",
+                    style = MaterialTheme.typography.bodySmall
+                )
+
+                Text(
+                    text = "Difficulty: ${recipe.difficulty}",
+                    style = MaterialTheme.typography.bodySmall
+                )
+
+                Text(
+                    text = "Calories: ${recipe.calories}",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
 fun BottomBar() {
-    BottomNavigation {
-        BottomNavigationItem(
+    NavigationBar(
+        contentColor = MaterialTheme.colorScheme.primary,
+        containerColor = Color.White
+    ) {
+        NavigationBarItem(
             icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
             label = { Text("Home") },
             selected = false, // Handle selection logic
             onClick = { /* Navigate to Home */ }
         )
-        BottomNavigationItem(
+        NavigationBarItem(
             icon = { Icon(Icons.Filled.Favorite, contentDescription = "Favorites") },
+            label = { Text("Home") },
+            selected = false, // Handle selection logic
+            onClick = { /* Navigate to Home */ }
+        )
+        NavigationBarItem(
+            icon = { Icon(Icons.Filled.Settings, contentDescription = "Setting") },
             label = { Text("Favorites") },
             selected = false, // Handle selection logic
             onClick = { /* Navigate to Favorites */ }
         )
-        // Add more navigation items for "My Recipes", "Settings", etc.
+        // Add more BottomNavigationItems for other sections like "Settings", etc.
     }
 }
 
-@Composable
-fun BottomNavigationItem(icon: @Composable () -> Unit, label: @Composable () -> Unit, selected: Boolean, onClick: () -> Unit) {
 
-}
 
-@Composable
-fun BottomNavigation(content: @Composable () -> Unit) {
 
-}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
