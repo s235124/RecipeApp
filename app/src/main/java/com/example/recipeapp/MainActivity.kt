@@ -18,8 +18,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -82,7 +84,7 @@ fun MainPage() {
                     .fillMaxSize()
             ) {
                 CustomSearchBar()
-                chips()
+                Chips()
                 grids()
             }
         }
@@ -106,7 +108,7 @@ fun CustomSearchBar() {
             )
         },
         modifier = Modifier
-            .fillMaxWidth()
+            .width(450.dp)
             .padding(16.dp)
             .height(56.dp),
 
@@ -129,7 +131,23 @@ fun CustomSearchBar() {
 
 @Preview (showBackground = true)
 @Composable
-fun chips() {
+fun Chips() {
+    Column {
+        Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(40.dp) // Adjust the height as per your design
+            .padding(horizontal = 10.dp)
+
+    ) {
+        Text(
+            text = "Categories",
+            style = MaterialTheme.typography.headlineMedium, // Adjust font style
+            color = Color.Black,
+            fontWeight = FontWeight.Bold
+        )
+    }
+    }
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -150,25 +168,45 @@ fun chips() {
 @Preview (showBackground = true)
 @Composable
 fun grids() {
-    val recipes = listOf("Crêpe", "Spaghetti", "Biryani", "Tacos") // Example list
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2), // 2 columns
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp)
-    ) {
-        items(recipes.size) { index ->
-            // Replace with your actual recipe composable
-            RecipeCard(recipeName = recipes[index])
+    Column {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(40.dp) // Adjust the height as per your design
+                .padding(horizontal = 10.dp)
+
+        ) {
+            Text(
+                text = "Recipe",
+                style = MaterialTheme.typography.headlineMedium, // Adjust font style
+                color = Color.Black,
+                fontWeight = FontWeight.Bold
+            )
+        }
+        val recipes = listOf(
+            Recipe("Crêpe", "15 min", "Easy", "200 kcal"),
+            Recipe("Spaghetti", "25 min", "Medium", "350 kcal"),
+            Recipe("Biryani", "45 min", "Hard", "600 kcal"),
+            Recipe("Tacos", "20 min", "Easy", "250 kcal")
+        )
+
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp)
+        ) {
+            items(recipes) { recipe ->
+                RecipeCard(recipe = recipe)
+            }
         }
     }
 }
 
 
+
 @Composable
-fun RecipeCard(recipeName: String) {
-    @Composable
-    fun RecipeCard(recipe: Recipe) {
+fun RecipeCard(recipe: Recipe) {
         Card(
             modifier = Modifier
                 .padding(8.dp)
@@ -213,8 +251,15 @@ fun RecipeCard(recipeName: String) {
                 )
             }
         }
-    }
 }
+
+data class Recipe(
+    val name: String,
+    val time: String,
+    val difficulty: String,
+    val calories: String
+)
+
 
 @Preview(showBackground = true)
 @Composable
