@@ -3,7 +3,6 @@ package com.example.recipeapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
@@ -27,6 +26,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
@@ -44,8 +44,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.recipeapp.ui.theme.Recipe
 import com.example.recipeapp.ui.theme.RecipeAppTheme
 import kotlinx.coroutines.launch
@@ -53,30 +57,34 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             RecipeAppTheme {
-                MainPage()
+                val navController = rememberNavController()
+                NavHost(navController = navController, startDestination = "main") {
+                    composable("main") { MainPage(navController) }
+                    composable("search/{query}") { backStackEntry ->
+                        val query = backStackEntry.arguments?.getString("query") ?: ""
+                        SearchResultsScreen(navController, query)
+                    }
                 }
             }
         }
     }
+}
 
 
 @Composable
-fun MainPage() {
+fun MainPage(navController: NavController) {
     val searchQuery = remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
 
     var recipes by remember { mutableStateOf(listOf<Recipe>()) }
-    var filteredRecipes by remember { mutableStateOf(listOf<Recipe>()) }
     var categories by remember { mutableStateOf(listOf<String>()) }
 
     // Simulate API call on startup
     LaunchedEffect(Unit) {
         coroutineScope.launch {
             recipes = fetchRecipes() // Fetch recipes from your API
-            filteredRecipes = recipes // Initially show all recipes
             categories = fetchCategories() // Fetch categories from your API
         }
     }
@@ -114,20 +122,59 @@ fun MainPage() {
                         searchQuery.value = query
                     },
                     onSearchButtonClick = {
-                        // Filter the main list based on the search query
-                        filteredRecipes = if (searchQuery.value.isEmpty()) {
-                            recipes // Show all recipes if search query is empty
-                        } else {
-                            recipes.filter { recipe ->
-                                recipe.name.contains(searchQuery.value, ignoreCase = true)
-                            }
-                        }
+                        navController.navigate("search/${searchQuery.value}")
                     }
                 )
                 Chips(categories) // Pass categories to the Chips function
-                Grids(filteredRecipes, searchQuery.value) // Pass filtered recipes to the Grids function
+                Grids(recipes) // Pass recipes to the Grids function
             }
         },
+    )
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchResultsScreen(navController: NavController, query: String) {
+    val coroutineScope = rememberCoroutineScope()
+    var filteredRecipes by remember { mutableStateOf(listOf<Recipe>()) }
+
+    LaunchedEffect(query) {
+        coroutineScope.launch {
+            val allRecipes = fetchRecipes() // Fetch all recipes
+            filteredRecipes = if (query.isEmpty()) {
+                allRecipes
+            } else {
+                allRecipes.filter { recipe ->
+                    recipe.name.startsWith(query, ignoreCase = true)
+                }
+            }
+        }
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Search Results") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
+        },
+        content = { paddingValues ->
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize()
+            ) {
+                items(filteredRecipes) { recipe ->
+                    RecipeCard(recipe = recipe)
+                }
+            }
+        }
     )
 }
 
@@ -136,7 +183,7 @@ fun MainPage() {
 fun CustomSearchBar(searchQuery: String, onSearchQueryChange: (String) -> Unit, onSearchButtonClick: () -> Unit) {
     Row(
         modifier = Modifier
-            .width(450.dp)
+            .fillMaxWidth()
             .padding(16.dp)
             .height(56.dp)
     ) {
@@ -171,7 +218,7 @@ fun CustomSearchBar(searchQuery: String, onSearchQueryChange: (String) -> Unit, 
         )
         Spacer(modifier = Modifier.width(8.dp))
         Button(
-            onClick = { onSearchButtonClick() },
+            onClick = onSearchButtonClick,
             shape = RoundedCornerShape(24.dp),
             contentPadding = PaddingValues(8.dp)
         ) {
@@ -213,7 +260,7 @@ fun Chips(categories: List<String>) {
 }
 
 @Composable
-fun Grids(recipes: List<Recipe>, searchQuery: String) {
+fun Grids(recipes: List<Recipe>) {
     Column {
         Box(
             modifier = Modifier
@@ -241,8 +288,6 @@ fun Grids(recipes: List<Recipe>, searchQuery: String) {
         }
     }
 }
-
-
 
 @Composable
 fun RecipeCard(recipe: Recipe) {
@@ -292,6 +337,7 @@ fun RecipeCard(recipe: Recipe) {
     }
 }
 
+
 // Simulated functions to fetch recipes and categories
 suspend fun fetchRecipes(): List<Recipe> {
     // Replace with actual API call
@@ -315,8 +361,6 @@ data class Recipe(
     val calories: String
 )
 
-
-@Preview(showBackground = true)
 @Composable
 fun BottomBar() {
     NavigationBar(
