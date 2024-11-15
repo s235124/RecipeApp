@@ -3,7 +3,9 @@ package com.example.recipeapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -25,12 +26,12 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.List
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -42,15 +43,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.recipeapp.ui.theme.Recipe
 import com.example.recipeapp.ui.theme.RecipeAppTheme
 import kotlinx.coroutines.launch
 
@@ -62,9 +64,8 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 NavHost(navController = navController, startDestination = "main") {
                     composable("main") { MainPage(navController) }
-                    composable("search/{query}") { backStackEntry ->
-                        val query = backStackEntry.arguments?.getString("query") ?: ""
-                        SearchResultsScreen(navController, query)
+                    composable("search") {
+                        SearchResultsScreen(navController)
                     }
                 }
             }
@@ -121,19 +122,21 @@ fun MainPage(navController: NavController) {
                     onSearchQueryChange = { query ->
                         searchQuery.value = query
                     },
-                    onSearchButtonClick = {
-                        navController.navigate("search/${searchQuery.value}")
-                    }
+                    navController = navController
                 )
+
                 Chips(categories) // Pass categories to the Chips function
-                Grids(recipes) // Pass recipes to the Grids function
+                Grids(
+                    recipes,
+                    navController = navController
+                ) // Pass recipes to the Grids function
             }
         },
     )
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+/*@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchResultsScreen(navController: NavController, query: String) {
     val coroutineScope = rememberCoroutineScope()
@@ -176,16 +179,84 @@ fun SearchResultsScreen(navController: NavController, query: String) {
             }
         }
     )
+}*/
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchResultsScreen(navController: NavController) {
+    val coroutineScope = rememberCoroutineScope()
+    var searchQuery by remember { mutableStateOf("") }
+    var filteredRecipes by remember { mutableStateOf(listOf<Recipe>()) }
+
+    // Fetch all recipes on screen load
+    LaunchedEffect(Unit) {
+        val allRecipes = fetchRecipes() // Call the suspend function here
+        filteredRecipes = allRecipes
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Search Recipes") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
+        },
+        content = { paddingValues ->
+            Column(modifier = Modifier.padding(paddingValues)) {
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { query ->
+                        searchQuery = query
+                        coroutineScope.launch {
+                            val allRecipes = fetchRecipes()
+                            filteredRecipes = if (query.isEmpty()) {
+                                allRecipes
+                            } else {
+                                allRecipes.filter {
+                                    it.name.contains(query, ignoreCase = true)
+                                }
+                            }
+                        }
+                    },
+                    placeholder = { Text("Search recipes...") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search Icon"
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                )
+
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(8.dp)
+                ) {
+                    items(filteredRecipes) { recipe ->
+                        RecipeCard(recipe = recipe, navController = navController)
+                    }
+                }
+            }
+        }
+    )
 }
 
 
 @Composable
-fun CustomSearchBar(searchQuery: String, onSearchQueryChange: (String) -> Unit, onSearchButtonClick: () -> Unit) {
+fun CustomSearchBar(searchQuery: String, onSearchQueryChange: (String) -> Unit, navController: NavController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
-            .height(56.dp)
+            .height(50.dp)
     ) {
         OutlinedTextField(
             value = searchQuery,
@@ -197,12 +268,17 @@ fun CustomSearchBar(searchQuery: String, onSearchQueryChange: (String) -> Unit, 
                 Icon(
                     imageVector = Icons.Default.Search,
                     contentDescription = "Search Icon",
-                    tint = Color.Gray
+                    tint = Color.Gray,
                 )
             },
             modifier = Modifier
                 .weight(1f)
-                .height(56.dp),
+                .height(56.dp)
+                .shadow( elevation = 20.dp, RoundedCornerShape(10.dp), clip = true)
+                .clickable {
+                    navController.navigate("search")
+                }
+            ,
             shape = RoundedCornerShape(24.dp),
             colors = TextFieldDefaults.colors(
                 focusedTextColor = Color.Black,
@@ -216,14 +292,6 @@ fun CustomSearchBar(searchQuery: String, onSearchQueryChange: (String) -> Unit, 
                 unfocusedIndicatorColor = Color.Transparent
             )
         )
-        Spacer(modifier = Modifier.width(8.dp))
-        Button(
-            onClick = onSearchButtonClick,
-            shape = RoundedCornerShape(24.dp),
-            contentPadding = PaddingValues(8.dp)
-        ) {
-            Text(text = "Search")
-        }
     }
 }
 
@@ -260,10 +328,10 @@ fun Chips(categories: List<String>) {
 }
 
 @Composable
-fun Grids(recipes: List<Recipe>) {
+fun Grids(recipes: List<Recipe>, modifier: Modifier = Modifier, navController: NavController) {
     Column {
         Box(
-            modifier = Modifier
+            Modifier
                 .fillMaxWidth()
                 .height(40.dp)
                 .padding(horizontal = 10.dp)
@@ -277,75 +345,131 @@ fun Grids(recipes: List<Recipe>) {
         }
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
-            modifier = Modifier
+            Modifier
                 .fillMaxSize()
                 .padding(8.dp)
-                .background(color = Color.LightGray)
+
         ) {
             items(recipes) { recipe ->
-                RecipeCard(recipe = recipe)
+                RecipeCard(
+                    recipe = recipe,
+                    navController = navController
+                )
             }
         }
     }
 }
 
-@Composable
-fun RecipeCard(recipe: Recipe) {
+/*@Composable
+fun RecipeCard(recipe: Recipe, modifier: Modifier = Modifier) {
+
+    val RecipeCardBackground = Color(0xFF8FBC8F) // Soft avocado-like green color
     Card(
-        modifier = Modifier
+        Modifier
             .padding(8.dp)
             .fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
-            modifier = Modifier.padding(8.dp),
+             Modifier.padding(0.dp).fillMaxSize().background(color = RecipeCardBackground),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Placeholder for recipe image (You can replace it with an actual image)
-            Box(
+            Image(
+                painter = painterResource(id = recipe.imageRes),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(100.dp)
-                    .background(Color.LightGray)
+                    .fillMaxWidth()
+                    .height(150.dp)
+
+
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer( Modifier.height(8.dp))
 
             Text(
                 text = recipe.name,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(8.dp),
+                color = Color.White
+
+
             )
 
             // Display time, difficulty, and calories
             Text(
                 text = "Time: ${recipe.time}",
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.White
+
             )
 
             Text(
                 text = "Difficulty: ${recipe.difficulty}",
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.White
+
             )
 
             Text(
                 text = "Calories: ${recipe.calories}",
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.White
             )
         }
     }
+}*/
+
+@Composable
+fun RecipeCard(recipe: Recipe, navController: NavController) {
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+            .clickable {
+                navController.navigate("recipeDetail/${recipe.name}")
+            },
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = recipe.imageRes),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = recipe.name,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Text("Time: ${recipe.time}", style = MaterialTheme.typography.bodySmall)
+            Text("Difficulty: ${recipe.difficulty}", style = MaterialTheme.typography.bodySmall)
+            Text("Calories: ${recipe.calories}", style = MaterialTheme.typography.bodySmall)
+        }
+    }
 }
+
 
 
 // Simulated functions to fetch recipes and categories
 suspend fun fetchRecipes(): List<Recipe> {
     // Replace with actual API call
     return listOf(
-        Recipe("Crêpe", "15 min", "Easy", "200 kcal"),
-        Recipe("Spaghetti", "25 min", "Medium", "350 kcal"),
-        Recipe("Biryani", "45 min", "Hard", "600 kcal"),
-        Recipe("Tacos", "20 min", "Easy", "250 kcal")
+        Recipe("Crêpe", "15 min", "Easy", "200 kcal",R.drawable.oip),
+        Recipe("Spaghetti", "25 min", "Medium", "350 kcal",R.drawable.oip),
+        Recipe("Biryani", "45 min", "Hard", "600 kcal",R.drawable.oip),
+        Recipe("Tacos", "20 min", "Easy", "250 kcal",R.drawable.oip)
     )
 }
 
@@ -358,7 +482,8 @@ data class Recipe(
     val name: String,
     val time: String,
     val difficulty: String,
-    val calories: String
+    val calories: String,
+    val imageRes: Int
 )
 
 @Composable
@@ -367,26 +492,27 @@ fun BottomBar() {
         contentColor = MaterialTheme.colorScheme.primary,
         containerColor = Color.White
     ) {
+        val bottomcolor= Color(0xFF8FBC8F)
         NavigationBarItem(
-            icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
+            icon = { Icon(Icons.Outlined.Home, contentDescription = "Home",tint = bottomcolor ) },
             label = { Text("Home") },
             selected = false, // Handle selection logic
             onClick = { /* Navigate to Home */ }
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Filled.AddCircle, contentDescription = "Setting") },
-            label = { Text("Favorites") },
+            icon = { Icon(Icons.Outlined.List, contentDescription = "Setting",tint = bottomcolor) },
+            label = { Text("ADDRecipe") },
             selected = false, // Handle selection logic
             onClick = { /* Navigate to Favorites */ }
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Filled.Favorite, contentDescription = "Favorites") },
-            label = { Text("Home") },
+            icon = { Icon(Icons.Outlined.Favorite, contentDescription = "Favorites",tint = bottomcolor ) },
+            label = { Text("Favorites") },
             selected = false, // Handle selection logic
             onClick = { /* Navigate to Home */ }
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Filled.Settings, contentDescription = "Setting") },
+            icon = { Icon(Icons.Outlined.Settings, contentDescription = "Setting", tint = bottomcolor) },
             label = { Text("Favorites") },
             selected = false, // Handle selection logic
             onClick = { /* Navigate to Favorites */ }
@@ -394,7 +520,6 @@ fun BottomBar() {
         // Add more BottomNavigationItems for other sections like "Settings", etc.
     }
 }
-
 
 
 
