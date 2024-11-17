@@ -8,8 +8,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -20,15 +22,20 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Settings
@@ -63,12 +70,23 @@ class MainActivity : ComponentActivity() {
         setContent {
             RecipeAppTheme {
                 val navController = rememberNavController()
+                // Fetch the recipes only once and share it across screens
+                val coroutineScope = rememberCoroutineScope()
+                var recipes by remember { mutableStateOf(emptyList<Recipe>()) }
+
+                // Fetch recipes on startup
+                LaunchedEffect(Unit) {
+                    coroutineScope.launch {
+                        recipes = fetchRecipes()
+                    }
+                }
+
                 NavHost(navController = navController, startDestination = "main") {
-                    composable("main") { MainPage(navController) }
+                    composable("main") { MainPage(navController, recipes) }
                     composable("search/{query}") {
                             backStackEntry ->
                         val query = backStackEntry.arguments?.getString("query") ?: ""
-                        SearchResultsScreen(navController, query)
+                        SearchResultsScreen(navController, query, recipes)
                     }
                     composable("recipeDetail/{recipeName}") { backStackEntry ->
                         val recipeName = backStackEntry.arguments?.getString("recipeName") ?: ""
@@ -78,10 +96,10 @@ class MainActivity : ComponentActivity() {
                         SettingScreen(navController)
                     }
                     composable("Favorites") {
-                        favoritesScreen(navController)
+                        favoritesScreen(navController,recipes)
                     }
                     composable("MyRecipes") {
-                        MyRecipesScreen(navController)
+                        MyRecipesScreen(navController, recipes)
                     }
                 }
             }
@@ -91,17 +109,15 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun MainPage(navController: NavController) {
+fun MainPage(navController: NavController, recipes: List<Recipe>) {
     val searchQuery = remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
 
-    var recipes by remember { mutableStateOf(listOf<Recipe>()) }
     var categories by remember { mutableStateOf(listOf<Category>()) }
 
     // Simulate API call on startup
     LaunchedEffect(Unit) {
         coroutineScope.launch {
-            recipes = fetchRecipes() // Fetch recipes from your API
             categories = fetchCategories()// Fetch categories from your API
         }
     }
@@ -157,25 +173,11 @@ fun MainPage(navController: NavController) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchResultsScreen(navController: NavController, query: String) {
-    val coroutineScope = rememberCoroutineScope()
+fun SearchResultsScreen(navController: NavController, query: String, recipes: List<Recipe>) {
     var searchQuery by remember { mutableStateOf("") }
-    var allRecipes by remember { mutableStateOf(listOf<Recipe>()) }
-    var filteredRecipes by remember { mutableStateOf(listOf<Recipe>()) }
+    var filteredRecipes = recipes.filter { it.name.contains(searchQuery, ignoreCase = true) }
 
-    // Fetch all recipes once when the screen loads
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            allRecipes = fetchRecipes()
-            filteredRecipes = if (query.isEmpty()) {
-                allRecipes
-            } else {
-                allRecipes.filter {
-                    it.name.contains(query, ignoreCase = true)
-                }
-            }
-        }
-    }
+
 
     Scaffold(
         topBar = {
@@ -195,14 +197,6 @@ fun SearchResultsScreen(navController: NavController, query: String) {
                     value = searchQuery,
                     onValueChange = { newQuery ->
                         searchQuery = newQuery
-                        // Filter recipes based on the search query
-                        filteredRecipes = if (newQuery.isEmpty()) {
-                            allRecipes
-                        } else {
-                            allRecipes.filter {
-                                it.name.contains(newQuery, ignoreCase = true)
-                            }
-                        }
                     },
                     placeholder = { Text("Search recipes...") },
                     leadingIcon = {
@@ -224,7 +218,11 @@ fun SearchResultsScreen(navController: NavController, query: String) {
                         .padding(8.dp)
                 ) {
                     items(filteredRecipes) { recipe ->
-                        RecipeCard(recipe = recipe, navController = navController)
+                        RecipeCard(
+                            recipe = recipe, navController = navController, modifier = Modifier
+                                .padding(horizontal = 8.dp)
+                                .fillMaxWidth()
+                        )
                     }
                 }
             }
@@ -234,7 +232,7 @@ fun SearchResultsScreen(navController: NavController, query: String) {
 
 
 @Composable
-fun CustomSearchBar(searchQuery: String, onSearchQueryChange: (String) -> Unit, navController: NavController) {
+fun CustomSearchBar(searchQuery: String, onSearchQueryChange: (String) -> Unit, navController: NavController, showNavigation: Boolean = true) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -245,11 +243,12 @@ fun CustomSearchBar(searchQuery: String, onSearchQueryChange: (String) -> Unit, 
             value = searchQuery,
             onValueChange = {
                 query -> onSearchQueryChange(query)
-                // Navigate to the search screen with the query
-                navController.navigate("search/${query}")
-                if (query.isNotEmpty()) {
+
+                // If showNavigation is true, navigate to search screen on query change
+                if (showNavigation && query.isNotEmpty()) {
                     navController.navigate("search/$query")
                 }
+
             },
             placeholder = {
                 Text(text = "Search for your wished recipes or categories")
@@ -351,7 +350,7 @@ fun Grids(recipes: List<Recipe>, modifier: Modifier = Modifier, navController: N
                 .padding(horizontal = 10.dp)
         ) {
             Text(
-                text = "Recipes",
+                text = "Suggestions",
                 style = MaterialTheme.typography.headlineMedium,
                 color = Color.Black,
                 fontWeight = FontWeight.Bold
@@ -367,7 +366,10 @@ fun Grids(recipes: List<Recipe>, modifier: Modifier = Modifier, navController: N
             items(recipes) { recipe ->
                 RecipeCard(
                     recipe = recipe,
-                    navController = navController
+                    navController = navController,
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .fillMaxWidth()
                 )
             }
         }
@@ -375,7 +377,7 @@ fun Grids(recipes: List<Recipe>, modifier: Modifier = Modifier, navController: N
 }
 
 @Composable
-fun RecipeCard(recipe: Recipe, navController: NavController) {
+fun RecipeCard(recipe: Recipe, navController: NavController, modifier: Modifier) {
     val cardBackgroundColor = Color(0xFF78B17E)
     Card(
         modifier = Modifier
@@ -484,53 +486,144 @@ fun SettingScreen(navController: NavController) {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun favoritesScreen(navController: NavController) {
+fun favoritesScreen(navController: NavController, recipes: List<Recipe>) {
+    var searchQuery by remember { mutableStateOf("") }
+    val filteredRecipes = recipes.filter { it.name.contains(searchQuery, ignoreCase = true) }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("favorites") }
+                title = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Favorite,
+                            contentDescription = "Favorites",
+                            modifier = Modifier.padding(end = 8.dp).size(24.dp),
+                            tint = Color(0xFF78B17E)
+                        )
+                        Text(
+                            text = "Favorites",
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
             )
         },
-        bottomBar = {
-            BottomBar(navController)
-        },
-        content = {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+        bottomBar = { BottomBar(navController) }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
+        ) {
+            // Search bar for filtering recipes
+            CustomSearchBar(
+                searchQuery = searchQuery,
+                onSearchQueryChange = { query -> searchQuery = query },
+                navController = navController,
+                showNavigation = false
+            )
 
+            // Updated LazyColumn with improved padding
+            LazyColumn(
+                contentPadding = PaddingValues(vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(filteredRecipes) { recipe ->
+                    RecipeCard(
+                        recipe = recipe,
+                        navController = navController,
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                            .fillMaxWidth()
+                    )
+                }
             }
         }
-    )
+    }
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyRecipesScreen(navController: NavController) {
+fun MyRecipesScreen(
+    navController: NavController,
+    recipes: List<Recipe>
+) {
+    var searchQuery by remember { mutableStateOf("") }
+    val filteredRecipes = recipes.filter { it.name.contains(searchQuery, ignoreCase = true) }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("favorites") }
+                title = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.List,
+                            contentDescription = "My Recipes",
+                            modifier = Modifier.padding(end = 8.dp).size(24.dp),
+                            tint = Color(0xFF78B17E)
+                        )
+                        Text(
+                            text = "My Recipes",
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.weight(1f)
+                        )
+                        IconButton(onClick = { /* Handle add recipe action */ }) {
+                            Icon(
+                                imageVector = Icons.Filled.AddCircle,
+                                contentDescription = "Add Recipe",
+                                modifier = Modifier.size(30.dp),
+                                tint = Color(0xFF78B17E)
+                            )
+                        }
+                    }
+                }
             )
         },
-        bottomBar = {
-            BottomBar(navController)
-        },
-        content = {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+        bottomBar = { BottomBar(navController) }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
+        ) {
+            // Search bar for filtering recipes
+            CustomSearchBar(
+                searchQuery = searchQuery,
+                onSearchQueryChange = { query -> searchQuery = query },
+                navController = navController,
+                showNavigation = false
+            )
 
+            // Updated LazyColumn with improved padding
+            LazyColumn(
+                contentPadding = PaddingValues(vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(filteredRecipes) { recipe ->
+                    RecipeCard(
+                        recipe = recipe,
+                        navController = navController,
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                            .fillMaxWidth()
+                    )
+                }
             }
         }
-    )
+    }
 }
 
 
@@ -552,8 +645,8 @@ suspend fun fetchCategories(): List<Category> {
         Category("Lebanon", R.drawable.flag_lebanon),
         Category("Pakistan", R.drawable.flag_pakistan),
         Category("Turkey", R.drawable.flag_turkey),
-        Category("Mexico", R.drawable.flag_mexico)
-
+        Category("Mexico", R.drawable.flag_mexico),
+        Category("Somalia", R.drawable.somali_flag)
     )
 }
 
@@ -590,7 +683,7 @@ fun BottomBar(navController: NavController) {
             onClick = { navController.navigate("MyRecipes") }
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Outlined.Favorite, contentDescription = "Favorites",tint = bottomcolor ) },
+            icon = { Icon(Icons.Outlined.FavoriteBorder, contentDescription = "Favorites",tint = bottomcolor ) },
             label = { Text("Favorites") },
             selected = false, // Handle selection logic
             onClick = { navController.navigate("Favorites") }
