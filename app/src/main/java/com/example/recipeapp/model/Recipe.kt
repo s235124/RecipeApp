@@ -1,4 +1,4 @@
-package com.example.recipeapp.ui.theme
+package com.example.recipeapp.model
 
 data class Recipe(
     val name: String,

@@ -31,18 +31,30 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -62,6 +74,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.recipeapp.ui.theme.RecipeAppTheme
 import kotlinx.coroutines.launch
@@ -98,11 +111,11 @@ class MainActivity : ComponentActivity() {
                         val recipeName = backStackEntry.arguments?.getString("recipeName") ?: ""
                         RecipeDetailScreen(navController, recipeName)
                     }
-                    composable("Setting") {
-                        SettingScreen(navController)
+                    composable("Settings") {
+                        SettingsScreen(navController)
                     }
                     composable("Favorites") {
-                        favoritesScreen(navController,recipes)
+                        FavoritesScreen(navController,recipes)
                     }
                     composable("MyRecipes") {
                         MyRecipesScreen(navController, categories)
@@ -195,7 +208,7 @@ fun SearchResultsScreen(navController: NavController, query: String, recipes: Li
                 title = { Text("Search Recipes") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 }
             )
@@ -442,7 +455,15 @@ fun RecipeDetailScreen(navController: NavController, recipeName: String) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Recipe Details") }
+                title = { Text("Recipe Details")},
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = null
+                        )
+                    }
+                }
             )
         },
         bottomBar = {
@@ -476,24 +497,139 @@ fun RecipeDetailScreen(navController: NavController, recipeName: String) {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingScreen(navController: NavController) {
+fun SettingsScreen(navController: NavController) {
+    val cardBackgroundColor = Color(0xFF78B17E)
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Setting") }
+                title = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Settings,
+                            contentDescription = "Settings",
+                            modifier = Modifier.padding(end = 8.dp).size(24.dp),
+                            tint = Color(0xFF78B17E)
+                        )
+                        Text(
+                            text = "Settings",
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
             )
         },
         bottomBar = {
             BottomBar(navController)
         },
-        content = {
+        content = { paddingValues ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp),
+                    .padding(paddingValues),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Spacer(modifier = Modifier.height(32.dp))
+                // Card for "Reset Favourites"
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp)
+                        .clickable {/* popup */},
+                    colors = CardDefaults.cardColors(containerColor = Color.Red),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                ) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize().clickable { /* Handle click event */ }
+                    ) {
+                        Text(
+                            text = "Reset Favourites",
+                            color = Color.White,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
 
+                // Card for "Remove Your Recipes"
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.Red),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                ) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize().clickable { /* Handle click event */ }
+                    ) {
+                        Text(
+                            text = "Remove Your Recipes",
+                            color = Color.White,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+
+                // Card for "Support"
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                ) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize().clickable { /* Handle click event */ }
+                    ) {
+                        Text(
+                            text = "Support",
+                            color = Color.Black,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+
+                // Card for "About"
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                ) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize().clickable { /* Handle click event */ }
+                    ) {
+                        Text(
+                            text = "About",
+                            color = Color.Black,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+
+                // Version Text
+                Text(
+                    text = "Version: 0.0.1",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
             }
         }
     )
@@ -502,7 +638,7 @@ fun SettingScreen(navController: NavController) {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun favoritesScreen(navController: NavController, recipes: List<Recipe>) {
+fun FavoritesScreen(navController: NavController, recipes: List<Recipe>) {
     var searchQuery by remember { mutableStateOf("") }
     val filteredRecipes = recipes.filter { it.name.contains(searchQuery, ignoreCase = true) }
 
@@ -591,7 +727,7 @@ fun MyRecipesScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.List,
+                            painter = painterResource(R.drawable.bookmark_filled),
                             contentDescription = "My Recipes",
                             modifier = Modifier.padding(end = 8.dp).size(24.dp),
                             tint = Color(0xFF78B17E)
@@ -864,53 +1000,78 @@ data class Category(
 
 @Composable
 fun BottomBar(navController: NavController) {
+//     Observe the current back stack entry to determine the current route
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = currentBackStackEntry?.destination?.route
+
     NavigationBar(
         contentColor = MaterialTheme.colorScheme.primary,
-        containerColor = Color.White
+        containerColor = Color(0xFFDBDBDB)
     ) {
-        val bottomcolor= Color(0xFF8FBC8F)
+        val bottomcolor = Color(0xFF8FBC8F)
+
         NavigationBarItem(
-            icon = { Icon(Icons.Outlined.Home, contentDescription = "Home",tint = bottomcolor ) },
+            icon = {
+                val icon = if (currentRoute == "main") Icons.Filled.Home else Icons.Outlined.Home
+                Icon(icon, contentDescription = "Home", tint = bottomcolor, modifier = Modifier.size(32.dp))
+            },
             label = { Text("Home") },
-            selected = false, // Handle selection logic
-            onClick = { navController.navigate("main") }
+            selected = false,
+            onClick = {
+                navController.navigate("main") {
+                    popUpTo(navController.graph.startDestinationId) { saveState = true }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            }
         )
+
         NavigationBarItem(
-            icon = { Icon(Icons.Outlined.List, contentDescription = "Setting",tint = bottomcolor) },
+            icon = {
+                val icon = if (currentRoute == "MyRecipes") R.drawable.bookmark_filled else R.drawable.bookmark_outlined
+                Icon(painterResource(icon), contentDescription = "My Recipes", tint = bottomcolor, modifier = Modifier.size(32.dp))
+            },
             label = { Text("My recipes") },
-            selected = false, // Handle selection logic
-            onClick = { navController.navigate("MyRecipes") }
+            selected = false,
+            onClick = {
+                navController.navigate("MyRecipes") {
+                    popUpTo(navController.graph.startDestinationId) { saveState = true }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            }
         )
+
         NavigationBarItem(
-            icon = { Icon(Icons.Outlined.FavoriteBorder, contentDescription = "Favorites",tint = bottomcolor ) },
+            icon = {
+                val icon = if (currentRoute == "Favorites") Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder
+                Icon(icon, contentDescription = "Favorites", tint = bottomcolor, modifier = Modifier.size(32.dp))
+            },
             label = { Text("Favorites") },
-            selected = false, // Handle selection logic
-            onClick = { navController.navigate("Favorites") }
+            selected = false,
+            onClick = {
+                navController.navigate("Favorites") {
+                    popUpTo(navController.graph.startDestinationId) { saveState = true }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            }
         )
+
         NavigationBarItem(
-            icon = { Icon(Icons.Outlined.Settings, contentDescription = "Setting", tint = bottomcolor) },
-            label = { Text("Favorites") },
-            selected = false, // Handle selection logic
-            onClick = { navController.navigate("setting") }
+            icon = {
+                val icon = if (currentRoute == "Settings") Icons.Filled.Settings else Icons.Outlined.Settings
+                Icon(icon, contentDescription = "Settings", tint = bottomcolor, modifier = Modifier.size(32.dp))
+            },
+            label = { Text("Settings") },
+            selected = false,
+            onClick = {
+                navController.navigate("settings") {
+                    popUpTo(navController.graph.startDestinationId) { saveState = true }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            }
         )
-        // Add more BottomNavigationItems for other sections like "Settings", etc.
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
