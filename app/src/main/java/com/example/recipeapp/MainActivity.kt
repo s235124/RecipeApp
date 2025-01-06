@@ -69,7 +69,7 @@ import com.example.recipeapp.model.Recipe
 import com.example.recipeapp.screens.AllCategoriesScreen
 import com.example.recipeapp.screens.CategoryRecipesScreen
 import com.example.recipeapp.screens.FavoritesScreen
-import com.example.recipeapp.screens.MyRecipesScreen
+import com.example.recipeapp.screens.recipe.MyRecipesScreen
 import com.example.recipeapp.screens.RecipeDetailScreen
 import com.example.recipeapp.screens.SearchResultsScreen
 import com.example.recipeapp.screens.SettingsScreen

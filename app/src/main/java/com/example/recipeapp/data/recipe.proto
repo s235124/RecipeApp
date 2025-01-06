@@ -1,0 +1,19 @@
+
+syntax = "proto3";
+
+option java_package = "com.example.recipeapp";
+option java_multiple_files = true;
+
+message Recipe {
+    int32 id = 1;
+    string name = 2;
+    string time = 3;
+    string difficulty = 4;
+    string calories = 5;
+    int32 imageRes = 6;
+    string categories = 7;
+}
+
+message RecipeList {
+    repeated Recipe recipes = 1;
+}

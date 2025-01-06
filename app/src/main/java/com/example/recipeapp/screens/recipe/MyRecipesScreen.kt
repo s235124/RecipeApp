@@ -1,4 +1,4 @@
-package com.example.recipeapp.screens
+package com.example.recipeapp.screens.recipe
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
