@@ -39,10 +39,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -69,6 +67,8 @@ import com.example.recipeapp.model.Recipe
 import com.example.recipeapp.screens.AllCategoriesScreen
 import com.example.recipeapp.screens.CategoryRecipesScreen
 import com.example.recipeapp.screens.FavoritesScreen
+import com.example.recipeapp.screens.MainScreen
+import com.example.recipeapp.screens.MyRecipesScreen
 import com.example.recipeapp.screens.recipe.MyRecipesScreen
 import com.example.recipeapp.screens.RecipeDetailScreen
 import com.example.recipeapp.screens.SearchResultsScreen
@@ -107,7 +107,7 @@ class MainActivity : ComponentActivity() {
                         ExitTransition.None
                     }
                 ) {
-                    composable("main") { MainPage(navController, recipes, categories) }
+                    composable("main") { MainScreen(navController, recipes, categories) }
                     composable("search/{query}") {
                             backStackEntry ->
                         val query = backStackEntry.arguments?.getString("query") ?: ""
@@ -137,57 +137,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MainPage(navController: NavController, recipes: List<Recipe>, categories: List<Category>) {
-    val searchQuery = remember { mutableStateOf("") }
-
-    Scaffold(
-        modifier = Modifier.background(color = Color.LightGray),
-        topBar = { // Change to top bar comp
-            TopAppBar(
-                title = { Text("Welcome") },
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
-        },
-        bottomBar = {
-            BottomBar(navController = navController )
-        },
-        content = { paddingValues ->
-            Column(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .fillMaxSize()
-            ) {
-                CustomSearchBar(
-                    searchQuery.value,
-                    onSearchQueryChange = { query ->
-                        searchQuery.value = query
-                    },
-                    navController = navController
-                )
-
-                Chips(
-                    categories = categories,
-                    onViewAllClick = {
-                        // Handle "View All Categories" click, navigate to another screen if needed
-                        navController.navigate("allCategories")
-                    },
-                    navController = navController
-                )
-
-                // Pass categories to the Chips function
-                Grids(
-                    recipes,
-                    navController = navController
-                ) // Pass recipes to the Grids function
-            }
-        },
-    )
 }
 
 
