@@ -41,14 +41,11 @@ fun RecipeDetailScreen(navController: NavController, recipeName: String) {
                 }
             )
         },
-        bottomBar = {
-            BottomBar(navController)
-        },
-        content = {
+        content = { innerPadding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp),
+                    .padding(innerPadding),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(

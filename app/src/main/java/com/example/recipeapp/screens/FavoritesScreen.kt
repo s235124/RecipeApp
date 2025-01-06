@@ -31,9 +31,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.recipeapp.BottomBar
-import com.example.recipeapp.CustomSearchBar
-import com.example.recipeapp.RecipeCard
-import com.example.recipeapp.model.Recipe
+import com.example.recipeapp.model.CustomSearchBar
+import com.example.recipeapp.model.RecipeCard
+import com.example.recipeapp.data.Recipe
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,8 +65,7 @@ fun FavoritesScreen(navController: NavController, recipes: List<Recipe>) {
                     }
                 }
             )
-        },
-        bottomBar = { BottomBar(navController) }
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier

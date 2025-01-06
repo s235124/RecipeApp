@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,7 +36,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.recipeapp.BottomBar
-import com.example.recipeapp.model.Category
+import com.example.recipeapp.data.Category
+import com.example.recipeapp.navigation.Route
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,8 +53,7 @@ fun AllCategoriesScreen(navController: NavController, categories: List<Category>
                     }
                 }
             )
-        },
-        bottomBar = { BottomBar(navController) }
+        }
     ) { paddingValues ->
         LazyColumn(
             contentPadding = PaddingValues(
@@ -70,7 +69,7 @@ fun AllCategoriesScreen(navController: NavController, categories: List<Category>
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { navController.navigate("categoryRecipes/${category.name}") }
+                        .clickable { navController.navigate("${Route.CategoryRecipesScreen.title}/${category.name}") }
                         .padding(vertical = 5.dp)
                 ) {
                     // Ensure flags are displayed properly

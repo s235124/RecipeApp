@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -16,11 +17,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import com.example.recipeapp.BottomBar
-import com.example.recipeapp.Chips
-import com.example.recipeapp.CustomSearchBar
-import com.example.recipeapp.Grids
-import com.example.recipeapp.model.Category
-import com.example.recipeapp.model.Recipe
+import com.example.recipeapp.model.Chips
+import com.example.recipeapp.model.CustomSearchBar
+import com.example.recipeapp.model.Grids
+import com.example.recipeapp.data.Category
+import com.example.recipeapp.data.Recipe
+import com.example.recipeapp.navigation.Route
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,14 +32,11 @@ fun MainScreen(navController: NavController, recipes: List<Recipe>, categories: 
     Scaffold(
         modifier = Modifier.background(color = Color.LightGray),
         topBar = { // Change to top bar comp
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 title = { Text("Welcome") },
                 modifier = Modifier
                     .fillMaxWidth()
             )
-        },
-        bottomBar = {
-            BottomBar(navController = navController)
         },
         content = { paddingValues ->
             Column(
@@ -55,11 +54,13 @@ fun MainScreen(navController: NavController, recipes: List<Recipe>, categories: 
 
                 Chips(
                     categories = categories,
+                    onCategoryClick = { name ->
+                        navController.navigate("${Route.CategoryRecipesScreen.title}/${name}")
+                    },
                     onViewAllClick = {
                         // Handle "View All Categories" click, navigate to another screen if needed
-                        navController.navigate("allCategories")
-                    },
-                    navController = navController
+                        navController.navigate(Route.AllCategoriesScreen.title)
+                    }
                 )
 
                 // Pass categories to the Chips function
