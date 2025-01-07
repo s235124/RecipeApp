@@ -3,8 +3,8 @@
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.recipeapp.data.Recipe
 import com.example.recipeapp.data.getMyRecipes
-import com.example.recipeapp.model.Recipe
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch

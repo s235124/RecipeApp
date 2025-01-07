@@ -41,6 +41,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -64,8 +65,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.recipeapp.model.Category
-import com.example.recipeapp.model.Recipe
+import com.example.recipeapp.data.Category
+import com.example.recipeapp.data.Recipe
+import com.example.recipeapp.navigation.MainNavHost
+import com.example.recipeapp.navigation.Route
 import com.example.recipeapp.screens.AllCategoriesScreen
 import com.example.recipeapp.screens.CategoryRecipesScreen
 import com.example.recipeapp.screens.FavoritesScreen
