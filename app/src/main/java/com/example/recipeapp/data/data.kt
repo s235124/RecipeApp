@@ -22,10 +22,12 @@ val SAVED_RECIPES_KEY = stringPreferencesKey("MyRecipe_")
 suspend fun saveMyRecipes(context: Context, myRecipes: List<Recipe>) {
     try {
         val jsonString = Json.encodeToString(myRecipes)
+        Log.d("SaveMyRecipes", "Serialized recipes: $jsonString")
         context.dataStore.edit { preferences ->
             preferences[SAVED_RECIPES_KEY] = jsonString
+            println("Recipes saved to DataStore: $jsonString")
+            Log.d("SaveMyRecipes", "Recipes saved successfully!")
         }
-        Log.d("SaveMyRecipes", "Recipes saved successfully!")
     } catch (e: Exception) {
         Log.e("SaveMyRecipes", "Error saving recipes: ${e.localizedMessage}")
     }
@@ -35,11 +37,20 @@ suspend fun saveMyRecipes(context: Context, myRecipes: List<Recipe>) {
 fun getMyRecipes(context: Context): Flow<List<Recipe>> {
     return context.dataStore.data.map { preferences ->
         val jsonString = preferences[SAVED_RECIPES_KEY] ?: "[]"
+        println("Recipes fetched from DataStore: $jsonString")
+        Log.d("GetMyRecipes", "Fetched recipes from DataStore: $jsonString")
         try {
             Json.decodeFromString(jsonString)
         } catch (e: Exception) {
+            Log.e("GetMyRecipes", "Error decoding recipes: ${e.message}")
             emptyList() // Return an empty list if decoding fails
         }
     }
 }
+
+suspend fun saveSampleDataToDataStore(context: Context) {
+    val sampleRecipe = Recipe("Sample", "10 min", "Easy", "100 kcal", imageRes = null, categories = "Test")
+    saveMyRecipes(context, listOf(sampleRecipe))
+}
+
 

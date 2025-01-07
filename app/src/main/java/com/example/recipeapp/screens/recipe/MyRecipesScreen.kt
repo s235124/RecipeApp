@@ -20,10 +20,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.recipeapp.RecipeCard
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.example.recipeapp.navigation.Route
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,6 +43,11 @@ fun MyRecipesScreen(
     // Observe the saved recipes from the ViewModel
     val savedRecipes = viewModel.recipes.collectAsState().value
 
+    // Debug logs for UI state
+    LaunchedEffect(savedRecipes) {
+        Log.d("MyRecipesScreen", "Saved recipes observed: $savedRecipes")
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -48,13 +56,13 @@ fun MyRecipesScreen(
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = Color.White
+                            tint = Color.Black
                         )
                     }
                 },
                 title = { Text("My Recipes") },
                 actions = {
-                    IconButton(onClick = { navController.navigate("CreateMyRecipe") }) {
+                    IconButton(onClick = { navController.navigate(Route.CreateMyRecipe.title) }) {
                         Icon(
                             imageVector = Icons.Filled.AddCircle,
                             contentDescription = "Add Recipe",

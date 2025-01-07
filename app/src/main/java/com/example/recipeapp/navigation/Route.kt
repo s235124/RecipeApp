@@ -9,5 +9,6 @@ sealed class Route (val title: String) {
     data object AllCategoriesScreen : Route("all_categories_screen")
     data object SearchResultScreen : Route("search_results_screen")
     data object SettingsScreen : Route("settings_screen")
+    data object CreateMyRecipe: Route("create_my_recipe")
 
 }

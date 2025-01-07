@@ -60,13 +60,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.recipeapp.data.Category
 import com.example.recipeapp.data.Recipe
+import com.example.recipeapp.data.saveSampleDataToDataStore
 import com.example.recipeapp.navigation.MainNavHost
 import com.example.recipeapp.navigation.Route
 import com.example.recipeapp.screens.AllCategoriesScreen
@@ -83,6 +86,9 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        lifecycleScope.launch {
+            saveSampleDataToDataStore(applicationContext)
+        }
         setContent {
             RecipeAppTheme {
                 val navController = rememberNavController()
@@ -92,6 +98,10 @@ class MainActivity : ComponentActivity() {
                 var recipes by remember { mutableStateOf(emptyList<Recipe>()) }
                 var categories by remember { mutableStateOf(emptyList<Category>()) }
 
+
+                val previousTab = navController.previousBackStackEntry?.destination?.route
+                val currentBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = currentBackStackEntry?.destination?.route
 
                 // Fetch recipes on startup
                 LaunchedEffect(Unit) {
@@ -147,209 +157,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CustomSearchBar(searchQuery: String, onSearchQueryChange: (String) -> Unit, navController: NavController, showNavigation: Boolean = true) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .height(50.dp)
-    ) {
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = {
-                query -> onSearchQueryChange(query)
-
-                // If showNavigation is true, navigate to search screen on query change
-                if (showNavigation && query.isNotEmpty()) {
-                    navController.navigate("search/$query")
-                }
-
-            },
-            placeholder = {
-                Text(text = "Search for your wished recipes or categories")
-            },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search Icon",
-                    tint = Color.Gray,
-                )
-            },
-            modifier = Modifier
-                .weight(1f)
-                .height(56.dp)
-                .shadow( elevation = 20.dp, RoundedCornerShape(10.dp), clip = true)
-            ,
-            shape = RoundedCornerShape(24.dp),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color.Gray,
-                unfocusedBorderColor = Color.Gray,
-                cursorColor = Color(0xFF78B17E)
-            )
-        )
-    }
-}
-
-
-@Composable
-fun Chips(categories: List<Category>, navController: NavController, onViewAllClick: () -> Unit ) {
-    Column {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(40.dp)
-                .padding(horizontal = 10.dp)
-        ) {
-            Text(
-                text = "Categories",
-                style = MaterialTheme.typography.headlineMedium,
-                color = Color.Black,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp)
-                .horizontalScroll(rememberScrollState())
-        ) {
-            categories.forEach { category ->
-                Column(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .clickable { navController.navigate("categoryRecipes/${category.name}")},
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-
-                        // Display the flag with rounded corners
-                        Image(
-                            painter = painterResource(id = category.flagResId),
-                            contentDescription = "${category.name} flag",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .size(60.dp)
-                                .clip(RoundedCornerShape(16.dp)) // Rounded corners
-                                .background(Color.White),
-
-                        )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Display the category name
-                    Text(
-                        text = category.name,
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
-                }
-            }
-            // Add a "View All Categories" button at the end
-            Text(
-                text = "View All Categories",
-                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
-                color = Color(0xFF78B17E),
-                modifier = Modifier
-                    .padding(8.dp)
-                    .clickable { onViewAllClick() }
-            )
-        }
-    }
-}
-
-@Composable
-fun Grids(recipes: List<Recipe>, modifier: Modifier = Modifier, navController: NavController) {
-    Column {
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .height(40.dp)
-                .padding(horizontal = 10.dp)
-        ) {
-            Text(
-                text = "Suggestions",
-                style = MaterialTheme.typography.headlineMedium,
-                color = Color.Black,
-                fontWeight = FontWeight.Bold
-            )
-        }
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            Modifier
-                .fillMaxSize()
-                .padding(8.dp)
-
-        ) {
-            items(recipes) { recipe ->
-                RecipeCard(
-                    recipe = recipe,
-                    navController = navController,
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .fillMaxWidth()
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun RecipeCard(recipe: Recipe, navController: NavController, modifier: Modifier) {
-    val cardBackgroundColor = Color(0xFF78B17E)
-
-    Card(
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth()
-            .clickable {
-                navController.navigate("recipeDetail/${recipe.name}")
-            },
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = cardBackgroundColor)
-    ) {
-        Column(
-            modifier = Modifier.padding(0.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Check if imageRes is available, else use imageUri
-            if (recipe.imageRes != null) {
-                Image(
-                    painter = painterResource(id = recipe.imageRes),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp)
-                )
-            } else if (recipe.imageUri != null) {
-                Image(
-                    painter = rememberAsyncImagePainter(model = Uri.parse(recipe.imageUri)),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = recipe.name,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-            Text("Time: ${recipe.time}", style = MaterialTheme.typography.bodySmall, color = Color.White)
-            Text("Difficulty: ${recipe.difficulty}", style = MaterialTheme.typography.bodySmall, color = Color.White)
-            Text("Calories: ${recipe.calories}", style = MaterialTheme.typography.bodySmall, color = Color.White)
-        }
-    }
-}
 
 
 

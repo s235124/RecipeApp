@@ -1,12 +1,9 @@
-package com.example.recipeapp.model
+package com.example.recipeapp
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -21,14 +18,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.recipeapp.data.Recipe
 import com.example.recipeapp.navigation.Route
 
 @Composable
 fun RecipeCard(recipe: Recipe, navController: NavController, modifier: Modifier) {
     val cardBackgroundColor = Color(0xFF78B17E)
+
     Card(
-        modifier = Modifier
+        modifier = modifier
             .padding(8.dp)
             .fillMaxWidth()
             .clickable {
@@ -37,22 +36,39 @@ fun RecipeCard(recipe: Recipe, navController: NavController, modifier: Modifier)
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = cardBackgroundColor)
-
     ) {
         Column(
             modifier = Modifier.padding(0.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Check if imageRes is available; otherwise, use imageUri
+            if (recipe.imageRes != null) {
+                Image(
+                    painter = painterResource(id = recipe.imageRes),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp)
+                )
+            } else if (recipe.imageUri != null) {
+                Image(
+                    painter = rememberAsyncImagePainter(model = Uri.parse(recipe.imageUri)),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp)
+                )
+            }
+            else {
+                Image(
+                    painter = painterResource(id = R.drawable.oip), // Use a placeholder image
+                    contentDescription = "Placeholder",
+                    modifier = Modifier.fillMaxWidth().height(150.dp)
+                )
+            }
 
-
-            ) {
-            Image(
-                painter = painterResource(id = recipe.imageRes),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(150.dp)
-            )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = recipe.name,
@@ -60,21 +76,9 @@ fun RecipeCard(recipe: Recipe, navController: NavController, modifier: Modifier)
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
-            Text(
-                "Time: ${recipe.time}",
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.White
-            )
-            Text(
-                "Difficulty: ${recipe.difficulty}",
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.White
-            )
-            Text(
-                "Calories: ${recipe.calories}",
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.White
-            )
+            Text("Time: ${recipe.time}", style = MaterialTheme.typography.bodySmall, color = Color.White)
+            Text("Difficulty: ${recipe.difficulty}", style = MaterialTheme.typography.bodySmall, color = Color.White)
+            Text("Calories: ${recipe.calories}", style = MaterialTheme.typography.bodySmall, color = Color.White)
         }
     }
 }

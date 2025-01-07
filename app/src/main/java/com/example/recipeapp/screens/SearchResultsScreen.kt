@@ -26,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.recipeapp.BottomBar
-import com.example.recipeapp.model.RecipeCard
+import com.example.recipeapp.RecipeCard
 import com.example.recipeapp.data.Recipe
 
 @OptIn(ExperimentalMaterial3Api::class)

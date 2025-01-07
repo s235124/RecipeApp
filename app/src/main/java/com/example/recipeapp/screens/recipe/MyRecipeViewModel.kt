@@ -5,22 +5,30 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.recipeapp.data.Recipe
 import com.example.recipeapp.data.getMyRecipes
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class MyRecipeViewModel(context: Context) : ViewModel() {
+    private val _recipes = MutableStateFlow<List<Recipe>>(emptyList())
+    val recipes: StateFlow<List<Recipe>> = _recipes
 
-    // Recipes fetched from DataStore as a StateFlow
-    val recipes: StateFlow<List<Recipe>> = getMyRecipes(context)
-        .catch { e ->
-            // Handle errors gracefully and provide an empty list as fallback
-            emit(emptyList())
+    init {
+        viewModelScope.launch {
+            try {
+
+
+                getMyRecipes(context).collect { recipeList ->
+                    _recipes.value = recipeList
+                    println("Recipes in ViewModel: $recipeList")
+                }
+            }catch (e: Exception){
+                println("Error fetching recipes: ${e.message}")
+            }
         }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
+    }
 }
+

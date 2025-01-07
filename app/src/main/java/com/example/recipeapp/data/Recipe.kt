@@ -2,6 +2,7 @@ package com.example.recipeapp.data
 
 import kotlinx.serialization.Serializable
 
+
 @Serializable
 data class Recipe(
     val name: String,

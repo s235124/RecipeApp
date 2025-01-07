@@ -1,5 +1,6 @@
 package com.example.recipeapp.navigation
 
+import CreateMyRecipe
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
@@ -60,7 +61,7 @@ fun MainNavHost(
 
         composable(Route.MyRecipesScreen.title) {
             onRouteChanged(Route.MyRecipesScreen)
-            MyRecipesScreen(navController, categories)
+            MyRecipesScreen(navController)
         }
 
         composable(Route.AllCategoriesScreen.title) {
@@ -77,6 +78,10 @@ fun MainNavHost(
         composable(Route.SettingsScreen.title) {
             onRouteChanged(Route.SettingsScreen)
             SettingsScreen(navController)
+        }
+        composable(Route.CreateMyRecipe.title) {
+            onRouteChanged(Route.CreateMyRecipe)
+            CreateMyRecipe(navController)
         }
     }
 

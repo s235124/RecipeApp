@@ -31,8 +31,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.recipeapp.BottomBar
+import com.example.recipeapp.RecipeCard
 import com.example.recipeapp.model.CustomSearchBar
-import com.example.recipeapp.model.RecipeCard
 import com.example.recipeapp.data.Recipe
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

@@ -19,14 +19,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import com.example.recipeapp.model.Recipe
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.example.recipeapp.data.Recipe
 
 @Composable
 fun CreateMyRecipe(navController: NavController) {
     val context = LocalContext.current
-    val viewModel: CreateMyRecipeViewModel= viewModel(factory = CreateMyRecipeViewModelFactory(context))
+    val viewModel: CreateMyRecipeViewModel =
+        viewModel(factory = CreateMyRecipeViewModelFactory(context))
 
     var name by remember { mutableStateOf("") }
     var time by remember { mutableStateOf("") }
@@ -61,7 +62,10 @@ fun CreateMyRecipe(navController: NavController) {
 
         TextField(value = name, onValueChange = { name = it }, label = { Text("Recipe Name") })
         TextField(value = time, onValueChange = { time = it }, label = { Text("Time") })
-        TextField(value = difficulty, onValueChange = { difficulty = it }, label = { Text("Difficulty") })
+        TextField(
+            value = difficulty,
+            onValueChange = { difficulty = it },
+            label = { Text("Difficulty") })
         TextField(value = calories, onValueChange = { calories = it }, label = { Text("Calories") })
 
         Button(
@@ -81,17 +85,28 @@ fun CreateMyRecipe(navController: NavController) {
         ) {
             Text("Save Recipe")
         }
+        // TEMPORARY: Add a button to save a sample recipe
+        Button(
+            onClick = {
+                viewModel.saveSampleRecipe()
+                navController.popBackStack()
+            }
+        ) {
+            Text("Save Sample Recipe")
+
+        }
     }
 }
 
 
 
 class CreateMyRecipeViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(CreateMyRecipeViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return CreateMyRecipeViewModel(context) as T
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(CreateMyRecipeViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return CreateMyRecipeViewModel(context) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
         }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
-}
+
