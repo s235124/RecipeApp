@@ -22,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,11 +32,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.recipeapp.data.Category
 import com.example.recipeapp.data.Recipe
+import com.example.recipeapp.http.PersonaViewModel
 import com.example.recipeapp.navigation.MainNavHost
 import com.example.recipeapp.navigation.Route
 import com.example.recipeapp.ui.theme.RecipeAppTheme
@@ -94,6 +97,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 ) { innerPadding ->
+                    val tags = fetchRecipeTags()
                     MainNavHost(
                         navController = navController,
                         onRouteChanged = { route ->
@@ -137,6 +141,15 @@ suspend fun fetchCategories(): List<Category> {
         Recipe("Kebab", "30 min", "Medium", "400 kcal", R.drawable.oip,"Pakistan")
     ))
     )
+}
+
+@Composable
+fun fetchRecipeTags(): List<String>? {
+    val viewModel: PersonaViewModel = viewModel() // Proper ViewModel instantiation
+    val recipeTags by viewModel.tags.collectAsState(initial = null) // Collect StateFlow
+
+    println(recipeTags)
+    return recipeTags
 }
 
 @Composable
