@@ -57,8 +57,12 @@ fun MainScreen(navController: NavController, recipes: List<Recipe>, categories: 
                 modifier = Modifier
                     .padding(paddingValues)
                     .fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                contentPadding = PaddingValues(
+                    start = 13.dp, //venstre side
+                    end = 13.dp, //højre side
+                    top = 20.dp,
+                    bottom = 80.dp),
+                verticalArrangement = Arrangement.spacedBy(7.dp) //afstand fra hver recipe card
             ) {
 
                 //søgelinje som en separat item
