@@ -62,9 +62,6 @@ fun SettingsScreen(navController: NavController) {
                 }
             )
         },
-        bottomBar = {
-            BottomBar(navController)
-        },
         content = { paddingValues ->
             Column(
                 modifier = Modifier

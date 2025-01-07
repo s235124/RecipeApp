@@ -26,8 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.recipeapp.BottomBar
-import com.example.recipeapp.RecipeCard
-import com.example.recipeapp.model.Recipe
+import com.example.recipeapp.model.RecipeCard
+import com.example.recipeapp.data.Recipe
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,7 +48,6 @@ fun SearchResultsScreen(navController: NavController, query: String, recipes: Li
                 }
             )
         },
-        bottomBar = { BottomBar(navController) },
         content = { paddingValues ->
             Column(modifier = Modifier.padding(paddingValues)) {
                 // Search Bar

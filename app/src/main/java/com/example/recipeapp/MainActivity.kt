@@ -45,7 +45,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,7 +56,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -66,7 +64,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import coil.compose.rememberAsyncImagePainter
 import com.example.recipeapp.model.Category
 import com.example.recipeapp.model.Recipe
 import com.example.recipeapp.screens.AllCategoriesScreen
@@ -101,6 +98,48 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
+                Scaffold (
+                    // TODO: FIGURE OUT WHAT TO DO WITH TOP BAR
+                    bottomBar = {
+                        BottomBar(
+                            onHomeClick = {
+                                navController.navigate(Route.MainScreen.title) {
+                                    launchSingleTop = true
+                                }
+                            },
+                            onMyRecipesClick = {
+                                navController.navigate(Route.MyRecipesScreen.title) {
+                                    launchSingleTop = true
+                                }
+                            },
+                            onSettingsClick = {
+                                navController.navigate(Route.SettingsScreen.title) {
+                                    launchSingleTop = true
+                                }
+                            },
+                            onFavoriteClick = {
+                                navController.navigate(Route.FavouritesScreen.title) {
+                                    launchSingleTop = true
+                                }
+                            },
+                            currentTab = currentRoute,
+                            previousTab = previousTab
+                        )
+                    }
+                ) { innerPadding ->
+                    MainNavHost(
+                        navController = navController,
+                        onRouteChanged = { route ->
+//                            Log.d("RecipeApp", "Navigated to route: ${route.title}")
+                        },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                        recipes = recipes,
+                        categories = categories
+                    )
+                }
+            }
                 NavHost(
                     navController = navController,
                     startDestination = "main",
@@ -381,10 +420,25 @@ suspend fun fetchCategories(): List<Category> {
 }
 
 @Composable
-fun BottomBar(navController: NavController) {
-//     Observe the current back stack entry to determine the current route
-    val currentBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = currentBackStackEntry?.destination?.route
+fun BottomBar(
+    modifier: Modifier = Modifier,
+    onHomeClick: () -> Unit,
+    onMyRecipesClick: () -> Unit,
+    onSettingsClick: () -> Unit,
+    onFavoriteClick: () -> Unit,
+    currentTab: String?,
+    previousTab: String?
+) {
+    val main = Route.MainScreen.title
+    val allCategory = Route.AllCategoriesScreen.title
+    val myRecipes = Route.MyRecipesScreen.title
+    val favorites = Route.FavouritesScreen.title
+    val settings = Route.SettingsScreen.title
+    val recipeDetails = Route.RecipeDetailScreen.title
+
+    val recipeDetailScreenFromHome = currentTab?.contains(recipeDetails) == true && previousTab == main
+    val recipeDetailScreenFromFavorites = currentTab?.contains(recipeDetails) == true && previousTab == favorites
+    val recipeDetailScreenFromMyRecipes = currentTab?.contains(recipeDetails) == true && previousTab == myRecipes
 
     NavigationBar(
         contentColor = MaterialTheme.colorScheme.primary,
@@ -394,66 +448,42 @@ fun BottomBar(navController: NavController) {
 
         NavigationBarItem(
             icon = {
-                val icon = if (currentRoute == "main" || currentRoute == "allCategories") Icons.Filled.Home else Icons.Outlined.Home
+                val icon = if (currentTab == main || currentTab == allCategory || recipeDetailScreenFromHome) Icons.Filled.Home else Icons.Outlined.Home
                 Icon(icon, contentDescription = "Home", tint = bottomcolor, modifier = Modifier.size(32.dp))
             },
             label = { Text("Home") },
             selected = false,
-            onClick = {
-                navController.navigate("main") {
-                    popUpTo(navController.graph.startDestinationId) { saveState = true }
-                    launchSingleTop = true
-                    restoreState = true
-                }
-            }
+            onClick = onHomeClick
         )
 
         NavigationBarItem(
             icon = {
-                val icon = if (currentRoute == "MyRecipes") R.drawable.bookmark_filled else R.drawable.bookmark_outlined
+                val icon = if (currentTab == myRecipes || recipeDetailScreenFromMyRecipes) R.drawable.bookmark_filled else R.drawable.bookmark_outlined
                 Icon(painterResource(icon), contentDescription = "My Recipes", tint = bottomcolor, modifier = Modifier.size(32.dp))
             },
             label = { Text("My recipes") },
             selected = false,
-            onClick = {
-                navController.navigate("MyRecipes") {
-                    popUpTo(navController.graph.startDestinationId) { saveState = true }
-                    launchSingleTop = true
-                    restoreState = true
-                }
-            }
+            onClick = onMyRecipesClick
         )
 
         NavigationBarItem(
             icon = {
-                val icon = if (currentRoute == "Favorites") Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder
+                val icon = if (currentTab == favorites || recipeDetailScreenFromFavorites) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder
                 Icon(icon, contentDescription = "Favorites", tint = bottomcolor, modifier = Modifier.size(32.dp))
             },
             label = { Text("Favorites") },
             selected = false,
-            onClick = {
-                navController.navigate("Favorites") {
-                    popUpTo(navController.graph.startDestinationId) { saveState = true }
-                    launchSingleTop = true
-                    restoreState = true
-                }
-            }
+            onClick = onFavoriteClick
         )
 
         NavigationBarItem(
             icon = {
-                val icon = if (currentRoute == "Settings") Icons.Filled.Settings else Icons.Outlined.Settings
+                val icon = if (currentTab == settings) Icons.Filled.Settings else Icons.Outlined.Settings
                 Icon(icon, contentDescription = "Settings", tint = bottomcolor, modifier = Modifier.size(32.dp))
             },
             label = { Text("Settings") },
             selected = false,
-            onClick = {
-                navController.navigate("settings") {
-                    popUpTo(navController.graph.startDestinationId) { saveState = true }
-                    launchSingleTop = true
-                    restoreState = true
-                }
-            }
+            onClick = onSettingsClick
         )
     }
 }

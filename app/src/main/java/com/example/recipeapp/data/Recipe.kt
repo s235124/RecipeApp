@@ -1,4 +1,4 @@
-package com.example.recipeapp.model
+package com.example.recipeapp.data
 
 import kotlinx.serialization.Serializable
 
