@@ -143,48 +143,6 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             }
-                NavHost(
-                    navController = navController,
-                    startDestination = "main",
-                    enterTransition = {
-                        EnterTransition.None
-                    },
-                    exitTransition = {
-                        ExitTransition.None
-                    }
-                ) {
-                    composable("main") { MainScreen(navController, recipes, categories) }
-                    composable("search/{query}") {
-                            backStackEntry ->
-                        val query = backStackEntry.arguments?.getString("query") ?: ""
-                        SearchResultsScreen(navController, query, recipes)
-                    }
-                    composable("recipeDetail/{recipeName}") { backStackEntry ->
-                        val recipeName = backStackEntry.arguments?.getString("recipeName") ?: ""
-                        RecipeDetailScreen(navController, recipeName)
-                    }
-                    composable("Settings") {
-                        SettingsScreen(navController)
-                    }
-                    composable("Favorites") {
-                        FavoritesScreen(navController,recipes)
-                    }
-
-                    composable("MyRecipes") {
-                        MyRecipesScreen(navController = navController)
-                    }
-
-
-                    composable("allCategories") {
-                        AllCategoriesScreen(navController, categories)
-                    }
-                    composable("categoryRecipes/{categoryName}") { backStackEntry ->
-                        val categoryName = backStackEntry.arguments?.getString("categoryName") ?: ""
-                        CategoryRecipesScreen(navController, categoryName, categories)
-                    }
-                    composable("createMyRecipe") { CreateMyRecipe(navController) }
-                }
-            }
         }
     }
 }

@@ -87,15 +87,6 @@ fun MyRecipesScreen(
                 }
             )
         },
-        bottomBar = { BottomBar(
-            navController,
-            onHomeClick = TODO(),
-            onMyRecipesClick = TODO(),
-            onSettingsClick = TODO(),
-            onFavoriteClick = TODO(),
-            currentTab = TODO(),
-            previousTab = TODO()
-        ) }
     ) { paddingValues ->
         Column(
             modifier = Modifier
