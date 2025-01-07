@@ -1,134 +1,97 @@
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.RowScopeInstance.weight
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-
-
+import android.content.Context
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.runtime.*
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
+import com.example.recipeapp.model.Recipe
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 
 @Composable
-fun CreateMyRecipe() {
+fun CreateMyRecipe(navController: NavController) {
+    val context = LocalContext.current
+    val viewModel: CreateMyRecipeViewModel= viewModel(factory = CreateMyRecipeViewModelFactory(context))
+
+    var name by remember { mutableStateOf("") }
+    var time by remember { mutableStateOf("") }
+    var difficulty by remember { mutableStateOf("") }
+    var calories by remember { mutableStateOf("") }
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        imageUri = uri
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Close Button (Top Left Corner)
-        IconButton(onClick = { /* Handle close */ }, modifier = Modifier.align(Alignment.Start)) {
-            Icon(
-                painter = painterResource(id = android.R.drawable.ic_menu_close_clear_cancel), // Use your custom close icon
-                contentDescription = "Close",
-                tint = Color.Black
+        if (imageUri != null) {
+            Image(
+                painter = rememberAsyncImagePainter(model = imageUri),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(150.dp)
+                    .clip(CircleShape)
             )
+        } else {
+            Button(onClick = { launcher.launch("image/*") }) {
+                Text("Select Image")
+            }
         }
 
-        // Upload Picture Button
+        TextField(value = name, onValueChange = { name = it }, label = { Text("Recipe Name") })
+        TextField(value = time, onValueChange = { time = it }, label = { Text("Time") })
+        TextField(value = difficulty, onValueChange = { difficulty = it }, label = { Text("Difficulty") })
+        TextField(value = calories, onValueChange = { calories = it }, label = { Text("Calories") })
+
         Button(
-            onClick = { /* Handle upload picture */ },
-            shape = RoundedCornerShape(50),
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(vertical = 16.dp)
+            onClick = {
+                viewModel.saveRecipe(
+                    Recipe(
+                        name = name,
+                        time = time,
+                        difficulty = difficulty,
+                        calories = calories,
+                        imageUri = imageUri?.toString(),
+                        categories = "Custom"
+                    )
+                )
+                navController.popBackStack()
+            }
         ) {
-            Text(text = "Upload picture", fontSize = 16.sp)
+            Text("Save Recipe")
         }
-
-        EditableField("Recipe name", "Enter recipe name here...")
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            AddFieldButton("Time")
-            AddFieldButton("Difficulty")
-            AddFieldButton("Calories")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        EditableField("Description", "Describe your recipe and what you can expect from it...")
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Ingredients",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        repeat(3) {
-            AddButton()
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        EditableField("Method", "Make a step by step method on how to make this recipe...")
     }
 }
 
-@Composable
-fun EditableField(title: String, hint: String) {
-    Column {
-        Text(
-            text = title,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
-        )
-        TextField(
-            value = "",
-            onValueChange = {},
-            placeholder = { Text(text = hint) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp),
-            singleLine = true,
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color(0xFFF5F5F5),
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            )
-        )
-    }
-}
 
-@Composable
-fun AddFieldButton(text: String) {
-    OutlinedButton(
-        onClick = { /* Handle button click */ },
-        shape = RoundedCornerShape(8.dp),
-        modifier = Modifier
-            .weight(1f)
-            .padding(horizontal = 4.dp)
-    ) {
-        Text(text = text, fontSize = 14.sp)
-    }
-}
 
-@Composable
-fun AddButton() {
-    OutlinedButton(
-        onClick = { /* Handle add ingredient */ },
-        shape = CircleShape,
-        modifier = Modifier.size(48.dp)
-    ) {
-        Text("+", textAlign = TextAlign.Center, fontSize = 18.sp)
+class CreateMyRecipeViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(CreateMyRecipeViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return CreateMyRecipeViewModel(context) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

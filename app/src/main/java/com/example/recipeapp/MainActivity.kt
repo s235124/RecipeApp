@@ -1,5 +1,7 @@
 package com.example.recipeapp
 
+import CreateMyRecipe
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -43,6 +45,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,6 +57,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -62,6 +66,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.recipeapp.model.Category
 import com.example.recipeapp.model.Recipe
 import com.example.recipeapp.screens.AllCategoriesScreen
@@ -69,7 +74,6 @@ import com.example.recipeapp.screens.CategoryRecipesScreen
 import com.example.recipeapp.screens.FavoritesScreen
 import com.example.recipeapp.screens.MainScreen
 import com.example.recipeapp.screens.MyRecipesScreen
-import com.example.recipeapp.screens.recipe.MyRecipesScreen
 import com.example.recipeapp.screens.RecipeDetailScreen
 import com.example.recipeapp.screens.SearchResultsScreen
 import com.example.recipeapp.screens.SettingsScreen
@@ -123,9 +127,12 @@ class MainActivity : ComponentActivity() {
                     composable("Favorites") {
                         FavoritesScreen(navController,recipes)
                     }
+
                     composable("MyRecipes") {
-                        MyRecipesScreen(navController, categories)
+                        MyRecipesScreen(navController = navController)
                     }
+
+
                     composable("allCategories") {
                         AllCategoriesScreen(navController, categories)
                     }
@@ -133,6 +140,7 @@ class MainActivity : ComponentActivity() {
                         val categoryName = backStackEntry.arguments?.getString("categoryName") ?: ""
                         CategoryRecipesScreen(navController, categoryName, categories)
                     }
+                    composable("createMyRecipe") { CreateMyRecipe(navController) }
                 }
             }
         }
@@ -292,6 +300,7 @@ fun Grids(recipes: List<Recipe>, modifier: Modifier = Modifier, navController: N
 @Composable
 fun RecipeCard(recipe: Recipe, navController: NavController, modifier: Modifier) {
     val cardBackgroundColor = Color(0xFF78B17E)
+
     Card(
         modifier = Modifier
             .padding(8.dp)
@@ -302,22 +311,32 @@ fun RecipeCard(recipe: Recipe, navController: NavController, modifier: Modifier)
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = cardBackgroundColor)
-
     ) {
         Column(
             modifier = Modifier.padding(0.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-
-
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(id = recipe.imageRes),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(150.dp)
-            )
+            // Check if imageRes is available, else use imageUri
+            if (recipe.imageRes != null) {
+                Image(
+                    painter = painterResource(id = recipe.imageRes),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp)
+                )
+            } else if (recipe.imageUri != null) {
+                Image(
+                    painter = rememberAsyncImagePainter(model = Uri.parse(recipe.imageUri)),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp)
+                )
+            }
+
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = recipe.name,
@@ -325,12 +344,13 @@ fun RecipeCard(recipe: Recipe, navController: NavController, modifier: Modifier)
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
-            Text("Time: ${recipe.time}", style = MaterialTheme.typography.bodySmall,color = Color.White)
-            Text("Difficulty: ${recipe.difficulty}", style = MaterialTheme.typography.bodySmall,color = Color.White)
-            Text("Calories: ${recipe.calories}", style = MaterialTheme.typography.bodySmall,color = Color.White)
+            Text("Time: ${recipe.time}", style = MaterialTheme.typography.bodySmall, color = Color.White)
+            Text("Difficulty: ${recipe.difficulty}", style = MaterialTheme.typography.bodySmall, color = Color.White)
+            Text("Calories: ${recipe.calories}", style = MaterialTheme.typography.bodySmall, color = Color.White)
         }
     }
 }
+
 
 
 // Simulated functions to fetch recipes and categories
@@ -346,16 +366,16 @@ suspend fun fetchCategories(): List<Category> {
     return listOf(
 
         Category("Italy", R.drawable.flag_italy, recipes =  listOf(
-            Recipe("Spaghetti", "25 min", "Medium", "350 kcal", R.drawable.oip, "Italy"),
-            Recipe("Risotto", "40 min", "Hard", "500 kcal", R.drawable.oip,"Italy")
+            Recipe("Spaghetti", "25 min", "Medium", "350 kcal", imageRes = R.drawable.oip, categories = "Italy"),
+            Recipe("Risotto", "40 min", "Hard", "500 kcal", imageRes =  R.drawable.oip, categories = "Italy")
         )),
          Category("Lebanon", R.drawable.flag_lebanon, recipes =  listOf(
-        Recipe("Hummus", "15 min", "Easy", "200 kcal", R.drawable.oip, "Lebanon"),
-        Recipe("Tabbouleh", "30 min", "Medium", "150 kcal", R.drawable.oip, "Lebanon")
+        Recipe("Hummus", "15 min", "Easy", "200 kcal", imageRes = R.drawable.oip, categories = "Lebanon"),
+        Recipe("Tabbouleh", "30 min", "Medium", "150 kcal", imageRes = R.drawable.oip, categories =  "Lebanon")
     )),
         Category("Pakistan", R.drawable.flag_pakistan, recipes = listOf(
-        Recipe("Biryani", "45 min", "Hard", "600 kcal", R.drawable.oip,"Pakistan"),
-        Recipe("Kebab", "30 min", "Medium", "400 kcal", R.drawable.oip,"Pakistan")
+        Recipe("Biryani", "45 min", "Hard", "600 kcal", imageRes = R.drawable.oip, categories = "Pakistan"),
+        Recipe("Kebab", "30 min", "Medium", "400 kcal", imageRes = R.drawable.oip, categories = "Pakistan")
     ))
     )
 }
