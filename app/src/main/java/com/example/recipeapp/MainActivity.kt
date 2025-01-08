@@ -1,7 +1,6 @@
 package com.example.recipeapp
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,12 +32,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.recipeapp.data.Category
+import com.example.recipeapp.data.CollectionAPI
 import com.example.recipeapp.data.Recipe
-import com.example.recipeapp.http.PersonaViewModel
+import com.example.recipeapp.http.APITestingViewModel
 import com.example.recipeapp.navigation.MainNavHost
 import com.example.recipeapp.navigation.Route
 import com.example.recipeapp.ui.theme.RecipeAppTheme
@@ -144,9 +143,9 @@ suspend fun fetchCategories(): List<Category> {
 }
 
 @Composable
-fun fetchRecipeTags(): List<String>? {
-    val viewModel: PersonaViewModel = viewModel() // Proper ViewModel instantiation
-    val recipeTags by viewModel.tags.collectAsState(initial = null) // Collect StateFlow
+fun fetchRecipeTags(): CollectionAPI? {
+    val viewModel: APITestingViewModel = viewModel() // Proper ViewModel instantiation
+    val recipeTags by viewModel.data.collectAsState(initial = null) // Collect StateFlow
 
     println(recipeTags)
     return recipeTags
