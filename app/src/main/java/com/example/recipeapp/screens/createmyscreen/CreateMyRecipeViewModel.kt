@@ -1,17 +1,16 @@
+package com.example.recipeapp.screens.createmyscreen
 
-
-import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.recipeapp.data.Recipe
-import com.example.recipeapp.data.saveMyRecipes
-import com.example.recipeapp.data.getMyRecipes
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import com.example.recipeapp.data.getMyRecipes
+import com.example.recipeapp.data.saveMyRecipes
 
 class CreateMyRecipeViewModel(val context: Context) : ViewModel() {
 
@@ -41,24 +40,12 @@ class CreateMyRecipeViewModel(val context: Context) : ViewModel() {
                 saveMyRecipes(context, updatedRecipes)
                 // Update the in-memory state only after saving
                 _recipes.value = updatedRecipes
-                Log.d("CreateMyRecipeViewModel", "Recipe saved: $updatedRecipes")
+                Log.d("com.example.recipeapp.screens.createmyscreen.CreateMyRecipeViewModel", "Recipe saved: $updatedRecipes")
             } catch (e: Exception) {
                 // Log or handle errors (optional)
-                Log.e("CreateMyRecipeViewModel", "Error saving recipe: ${e.message}")
+                Log.e("com.example.recipeapp.screens.createmyscreen.CreateMyRecipeViewModel", "Error saving recipe: ${e.message}")
                 e.printStackTrace()
             }
         }
     }
-
-        fun saveSampleRecipe() {
-            val sampleRecipe = Recipe(
-                name = "Test Recipe",
-                time = "10 min",
-                difficulty = "Easy",
-                calories = "100 kcal",
-                imageRes = null, // Or use a placeholder image resource ID if needed
-                categories = "Test"
-            )
-            saveRecipe(sampleRecipe)
-        }
 }

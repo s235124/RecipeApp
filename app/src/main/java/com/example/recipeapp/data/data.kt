@@ -9,7 +9,6 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import android.util.Log
@@ -48,9 +47,6 @@ fun getMyRecipes(context: Context): Flow<List<Recipe>> {
     }
 }
 
-suspend fun saveSampleDataToDataStore(context: Context) {
-    val sampleRecipe = Recipe("Sample", "10 min", "Easy", "100 kcal", imageRes = null, categories = "Test")
-    saveMyRecipes(context, listOf(sampleRecipe))
-}
+
 
 
