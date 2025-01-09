@@ -110,7 +110,7 @@ fun MainScreen(navController: NavController, recipes: List<Recipe>, categories: 
                                 recipe = recipe,
                                 navController = navController,
                                 modifier = Modifier
-                                    .width(200.dp) // Bredden for hvert kort
+                                    .width(180.dp) // Bredden for hvert kort
                                     .height(250.dp) // Højden for hvert kort
                                     .padding(vertical = 6.dp)
                             )
