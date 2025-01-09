@@ -5,9 +5,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -52,7 +57,6 @@ fun MainScreen(navController: NavController, recipes: List<Recipe>, categories: 
             )
         },
         content = { paddingValues ->
-            //LazyColumn som den eneste scrollable container
             LazyColumn(
                 modifier = Modifier
                     .padding(paddingValues)
@@ -61,16 +65,13 @@ fun MainScreen(navController: NavController, recipes: List<Recipe>, categories: 
                     start = 13.dp, //venstre side
                     end = 13.dp, //højre side
                     top = 20.dp,
-                    bottom = 80.dp),
-                verticalArrangement = Arrangement.spacedBy(7.dp) //afstand fra hver recipe card
+                    bottom = 80.dp), verticalArrangement = Arrangement.spacedBy(7.dp) //afstand fra hver recipe card
             ) {
-
                 //søgelinje som en separat item
                 item{
                     CustomSearchBar(searchQuery.value,
                         onSearchQueryChange = {query ->
-                            searchQuery.value = query
-                        },
+                            searchQuery.value = query },
                         navController = navController
                     )
                 }
@@ -79,7 +80,7 @@ fun MainScreen(navController: NavController, recipes: List<Recipe>, categories: 
                 item{
                     Chips(categories = categories,
                         onCategoryClick = {name ->
-                            navController.navigate("${Route.CategoryRecipesScreen.title}/${name}")
+                           navController.navigate("${Route.CategoryRecipesScreen.title}/$name")
                         },
                         onViewAllClick = {
                             navController.navigate(Route.AllCategoriesScreen.title)
@@ -97,14 +98,36 @@ fun MainScreen(navController: NavController, recipes: List<Recipe>, categories: 
                     )
                 }
 
-                //suggestions som lister i LazyColumn
-                items(recipes){recipe ->
-                    RecipeCard(recipe = recipe,
-                        navController = navController,
+                items(recipes.chunked(2)){recipePair ->
+                    Row(
                         modifier = Modifier
-                            .padding(horizontal = 8.dp)
                             .fillMaxWidth()
-                    )}
+                            .padding(horizontal = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp) // Afstand mellem kort
+                    ) {
+                        recipePair.forEach { recipe ->
+                            RecipeCard(
+                                recipe = recipe,
+                                navController = navController,
+                                modifier = Modifier
+                                    .width(200.dp) // Bredden for hvert kort
+                                    .height(250.dp) // Højden for hvert kort
+                                    .padding(vertical = 6.dp)
+                            )
+                        }
+                        // Hvis der kun er én opskrift i rækken, tilføj en Spacer for at udfylde plads
+                        if (recipePair.size < 2){
+                            Spacer(
+                                modifier = Modifier
+                                    .width(150.dp)
+                                    .height(200.dp)
+                            )
+                        }
+                    }
+                }
+
+
+
             }
         }
     )
