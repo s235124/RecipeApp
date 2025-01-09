@@ -5,6 +5,7 @@ import com.example.recipeapp.data.CollectionAPI
 import com.example.recipeapp.data.IngredientAPI
 import com.example.recipeapp.data.RecipeAPI
 import retrofit2.http.GET
+import retrofit2.http.Query
 
 interface RecipeApiService {
     @GET("/recipetags")

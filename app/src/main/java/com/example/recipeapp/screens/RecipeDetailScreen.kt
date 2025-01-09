@@ -26,13 +26,14 @@ import com.example.recipeapp.BottomBar
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecipeDetailScreen(navController: NavController, recipeName: String) {
+fun RecipeDetailScreen(onBackButtonClick: () -> Unit, recipeName: String) {
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Recipe Details") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = onBackButtonClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = null

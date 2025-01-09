@@ -5,36 +5,38 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class RecipeAPI(
     val items: ArrayList<RecipeItem>
-)
+) {
+    constructor() : this(ArrayList())
+}
 
 @Serializable
 data class RecipeItem(
-    val uid: String,
-    val thumbnailURL: String,
-    val collectionIds: ArrayList<String>,
-    val carbs: Int,
-    val cookingTime: Int,
+    val uid: String? = null,
+    val thumbnailUrl: String? = null,
+    val collectionsIds: ArrayList<String>? = null,
+    val carbs: Int? = null,
+    val cookingTime: Int? = null,
     val description: String,
-    val difficult: String,
-    val fat: Int,
-    val fibre: Int,
-    val ingredients: ArrayList<RecipeIngredient>,
-    val kcal: Int,
-    val nutrition: String,
-    val preparationTime: Int,
-    val protein: Int,
-    val salt: Int,
-    val saturates: Int,
-    val serves: String,
+    val difficult: String? = null,
+    val fat: Int? = null,
+    val fibre: Int? = null,
+    val ingredients: ArrayList<RecipeIngredient>? = null,
+    val kcal: Int? = null,
+    val nutrition: String? = null,
+    val preparationTime: Int? = null,
+    val protein: Int? = null,
+    val salt: Int? = null,
+    val saturates: Int? = null,
+    val serves: String? = null,
     val steps: ArrayList<String>,
-    val sugars: Int,
-    val tags: ArrayList<String>,
-    val categoriesIds: ArrayList<String>
+    val sugars: Int? = null,
+    val tags: ArrayList<String>? = null,
+    val categoriesIds: ArrayList<String>? = null
 )
 
 @Serializable
 data class RecipeIngredient(
-    val uid: String,
-    val name: String,
+    val uid: String? = null,
+    val name: String? = null,
     val description: String
 )

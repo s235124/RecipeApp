@@ -99,7 +99,8 @@ fun MyRecipesScreen(
                 searchQuery = searchQuery,
                 onSearchQueryChange = { query -> searchQuery = query },
                 navController = navController,
-                showNavigation = false
+                showNavigation = false,
+                paddingValues = paddingValues
             )
 
             // Updated LazyColumn with improved padding

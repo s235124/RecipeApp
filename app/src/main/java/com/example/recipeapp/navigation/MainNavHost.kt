@@ -1,5 +1,6 @@
 package com.example.recipeapp.navigation
 
+import android.net.Uri
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
@@ -9,14 +10,18 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.recipeapp.data.Category
 import com.example.recipeapp.data.Recipe
+import com.example.recipeapp.data.RecipeAPI
+import com.example.recipeapp.data.RecipeItem
 import com.example.recipeapp.screens.AllCategoriesScreen
 import com.example.recipeapp.screens.CategoryRecipesScreen
 import com.example.recipeapp.screens.FavoritesScreen
 import com.example.recipeapp.screens.MainScreen
 import com.example.recipeapp.screens.MyRecipesScreen
 import com.example.recipeapp.screens.RecipeDetailScreen
-import com.example.recipeapp.screens.SearchResultsScreen
-import com.example.recipeapp.screens.SettingsScreen
+import com.example.recipeapp.screens.RecipeDetailsFromAPIScreen
+import com.example.recipeapp.screens.SearchScreen
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @Composable
 fun MainNavHost(
@@ -25,7 +30,8 @@ fun MainNavHost(
     modifier: Modifier = Modifier,
 //    favorites: MutableList<Recipe>, TODO: ADD THESE BACK LATER ON
 //    onSaveFavorites: (List<Recipe>) -> Unit,
-    recipes: List<Recipe>,
+    recipesFromAPI: RecipeAPI,
+    recipes: List<Recipe>, // TODO: REMOVE WHEN RECIPES FROM API IS FULLY CHANGED IN ALL THE MODEL CLASSES
     categories: List<Category>
 ) {
     NavHost(
@@ -41,16 +47,26 @@ fun MainNavHost(
             MainScreen(navController, recipes, categories)
         }
 
-        composable("${Route.SearchResultScreen.title}/{query}") { backStackEntry ->
-            onRouteChanged(Route.SearchResultScreen)
-            val query = backStackEntry.arguments?.getString("query") ?: ""
-            SearchResultsScreen(navController, query, recipes)
+        composable(Route.SearchScreen.title) {
+            onRouteChanged(Route.SearchScreen)
+
+            SearchScreen(
+                onCardClick = { recipe ->
+                    val recipeJson = Uri.encode(Json.encodeToString(recipe))
+                    navController.navigate("${Route.RecipeDetailScreen.title}/${recipeJson}")
+                              },
+                recipes = recipesFromAPI)
         }
 
-        composable("${Route.RecipeDetailScreen.title}/{recipeName}") { backStackEntry ->
+        composable("${Route.RecipeDetailScreen.title}/{recipeJson}") { backStackEntry ->
             onRouteChanged(Route.RecipeDetailScreen)
-            val recipeName = backStackEntry.arguments?.getString("recipeName") ?: ""
-            RecipeDetailScreen(navController, recipeName)
+            val recipeJson = backStackEntry.arguments?.getString("recipeJson") ?: ""
+            val format = Json { ignoreUnknownKeys = true }
+            val recipe = recipeJson.let {format.decodeFromString<RecipeItem>(Uri.decode(it))}
+            RecipeDetailsFromAPIScreen(
+                onBackButtonClick = { navController.popBackStack() },
+                recipe = recipe
+            )
         }
 
         composable(Route.FavouritesScreen.title) {
@@ -72,11 +88,6 @@ fun MainNavHost(
             onRouteChanged(Route.CategoryRecipesScreen)
             val categoryName = backStackEntry.arguments?.getString("categoryName") ?: ""
             CategoryRecipesScreen(navController, categoryName, categories)
-        }
-
-        composable(Route.SettingsScreen.title) {
-            onRouteChanged(Route.SettingsScreen)
-            SettingsScreen(navController)
         }
     }
 

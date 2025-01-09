@@ -44,14 +44,6 @@ fun MainScreen(navController: NavController, recipes: List<Recipe>, categories: 
                     .padding(paddingValues)
                     .fillMaxSize()
             ) {
-                CustomSearchBar(
-                    searchQuery.value,
-                    onSearchQueryChange = { query ->
-                        searchQuery.value = query
-                    },
-                    navController = navController
-                )
-
                 Chips(
                     categories = categories,
                     onCategoryClick = { name ->
@@ -65,7 +57,7 @@ fun MainScreen(navController: NavController, recipes: List<Recipe>, categories: 
 
                 // Pass categories to the Chips function
                 Grids(
-                    recipes,
+                    recipes = recipes,
                     navController = navController
                 ) // Pass recipes to the Grids function
             }
