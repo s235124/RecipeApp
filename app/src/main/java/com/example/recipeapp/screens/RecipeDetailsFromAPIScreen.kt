@@ -69,21 +69,27 @@ fun RecipeDetailsFromAPIScreen(onBackButtonClick: () -> Unit, recipe: RecipeItem
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(150.dp)
+                                .height(200.dp)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                     }
 
                     // Making sure no nulls are included
-                    var timeText = "Time: "
+                    val timeText = buildString {
+                        if (recipe.preparationTime != null && recipe.cookingTime != null) append("${recipe.preparationTime} + ${recipe.cookingTime}")
+                        else if (recipe.preparationTime != null) append("${recipe.preparationTime}")
+                        else if (recipe.cookingTime != null) append("${recipe.cookingTime}")
+                        append(" min")
+                    }
 
-                    if (recipe.preparationTime != null) timeText += "${recipe.preparationTime}"
-                    if (recipe.cookingTime != null) timeText += " + ${recipe.cookingTime}"
-
-                    timeText += " min"
-
-                    val difficulty =
-                        recipe.difficult?.replaceFirstChar { it.uppercase() } ?: "Unknown"
+                    val properDifficulty = buildString {
+                        when (recipe.difficult) {
+                            "easy" -> append("Easy")
+                            "moreEffort" -> append("More Effort")
+                            "aChallenge" -> append("A Challenge")
+                            else -> append("Unknown")
+                        }
+                    }
 
                     val calories: String = if (recipe.kcal == null) "Unknown"
                     else recipe.kcal.toString()
@@ -91,7 +97,7 @@ fun RecipeDetailsFromAPIScreen(onBackButtonClick: () -> Unit, recipe: RecipeItem
                     // Small descriptive text
                     item {
                         Text(
-                            text = "$timeText | $difficulty | $calories kcal",
+                            text = "$timeText | $properDifficulty | $calories kcal",
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                             textAlign = TextAlign.Center
