@@ -17,8 +17,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -47,19 +45,14 @@ fun CreateMyRecipe(navController: NavController) {
     var difficulty by remember { mutableStateOf("") }
     var calories by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
+    var ingredients by remember { mutableStateOf("") }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         imageUri = uri
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Create Recipe") }
-            )
-        }
-    ) {
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -124,8 +117,10 @@ fun CreateMyRecipe(navController: NavController) {
                             time = time,
                             difficulty = difficulty,
                             calories = calories,
+                            description = description,
                             imageUri = imageUri?.toString(),
-                            categories = "Custom"
+                            categories = "Custom",
+                            ingredient = ingredients
                         )
                     )
                     navController.popBackStack()
@@ -136,7 +131,7 @@ fun CreateMyRecipe(navController: NavController) {
             }
         }
     }
-}
+
 
 @Composable
 fun MultiLineTextField(

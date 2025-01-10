@@ -3,8 +3,11 @@ package com.example.recipeapp.navigation
 import CreateMyRecipe
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -49,9 +52,13 @@ fun MainNavHost(
         }
 
         composable("${Route.RecipeDetailScreen.title}/{recipeName}") { backStackEntry ->
-            onRouteChanged(Route.RecipeDetailScreen)
             val recipeName = backStackEntry.arguments?.getString("recipeName") ?: ""
-            RecipeDetailScreen(navController, recipeName)
+            val recipe = recipes.find { it.name == recipeName }
+            if (recipe != null) {
+               // Route.RecipeDetailScreen(navController = navController, recipe = recipe)
+            } else {
+                Text("Recipe not found!", modifier = Modifier.fillMaxSize(), textAlign = TextAlign.Center)
+            }
         }
 
         composable(Route.FavouritesScreen.title) {
