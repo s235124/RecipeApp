@@ -78,7 +78,8 @@ fun FavoritesScreen(navController: NavController, recipes: List<Recipe>) {
                 searchQuery = searchQuery,
                 onSearchQueryChange = { query -> searchQuery = query },
                 navController = navController,
-                showNavigation = false
+                showNavigation = false,
+                paddingValues
             )
 
             // Updated LazyColumn with improved padding

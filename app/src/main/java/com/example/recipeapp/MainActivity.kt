@@ -1,7 +1,6 @@
 package com.example.recipeapp
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,10 +9,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -22,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,13 +31,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.recipeapp.data.Category
+import com.example.recipeapp.data.CategoryAPI
 import com.example.recipeapp.data.Recipe
+import com.example.recipeapp.data.RecipeAPI
+import com.example.recipeapp.http.APITestingViewModel
 import com.example.recipeapp.navigation.MainNavHost
 import com.example.recipeapp.navigation.Route
+import com.example.recipeapp.screens.RecipeViewModel
 import com.example.recipeapp.ui.theme.RecipeAppTheme
 import kotlinx.coroutines.launch
 
@@ -50,12 +54,15 @@ class MainActivity : ComponentActivity() {
                 // Fetch the recipes only once and share it across screens
                 val coroutineScope = rememberCoroutineScope()
 
+                var recipeAPI by remember { mutableStateOf(RecipeAPI()) }
                 var recipes by remember { mutableStateOf(emptyList<Recipe>()) }
                 var categories by remember { mutableStateOf(emptyList<Category>()) }
 
                 val currentBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = currentBackStackEntry?.destination?.route
                 val previousTab = navController.previousBackStackEntry?.destination?.route
+
+                recipeAPI = fetchRecipesFromAPI()
 
                 // Fetch recipes on startup
                 LaunchedEffect(Unit) {
@@ -79,8 +86,8 @@ class MainActivity : ComponentActivity() {
                                     launchSingleTop = true
                                 }
                             },
-                            onSettingsClick = {
-                                navController.navigate(Route.SettingsScreen.title) {
+                            onSearchClick = {
+                                navController.navigate(Route.SearchScreen.title) {
                                     launchSingleTop = true
                                 }
                             },
@@ -94,6 +101,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 ) { innerPadding ->
+//                    val tags = fetchData()
                     MainNavHost(
                         navController = navController,
                         onRouteChanged = { route ->
@@ -102,6 +110,7 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(innerPadding),
+                        recipesFromAPI = recipeAPI,
                         recipes = recipes,
                         categories = categories
                     )
@@ -111,6 +120,16 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@Composable
+fun fetchRecipesFromAPI(): RecipeAPI {
+    val viewModel: RecipeViewModel = viewModel() // Proper ViewModel instantiation
+    val recipes by viewModel.data.collectAsState(initial = null) // Collect StateFlow
+
+//    println(recipeTags)
+
+    return if (recipes == null) RecipeAPI()
+    else recipes as RecipeAPI
+}
 
 // Simulated functions to fetch recipes and categories
 suspend fun fetchRecipes(): List<Recipe> {
@@ -139,12 +158,21 @@ suspend fun fetchCategories(): List<Category> {
     )
 }
 
+//@Composable
+//fun fetchData(): CategoryAPI? {
+//    val viewModel: APITestingViewModel = viewModel() // Proper ViewModel instantiation
+//    val recipeTags by viewModel.data.collectAsState(initial = null) // Collect StateFlow
+//
+////    println(recipeTags)
+//    return recipeTags
+//}
+
 @Composable
 fun BottomBar(
     modifier: Modifier = Modifier,
     onHomeClick: () -> Unit,
     onMyRecipesClick: () -> Unit,
-    onSettingsClick: () -> Unit,
+    onSearchClick: () -> Unit,
     onFavoriteClick: () -> Unit,
     currentTab: String?,
     previousTab: String?
@@ -153,7 +181,7 @@ fun BottomBar(
     val allCategory = Route.AllCategoriesScreen.title
     val myRecipes = Route.MyRecipesScreen.title
     val favorites = Route.FavouritesScreen.title
-    val settings = Route.SettingsScreen.title
+    val search = Route.SearchScreen.title
     val recipeDetails = Route.RecipeDetailScreen.title
 
     val recipeDetailScreenFromHome = currentTab?.contains(recipeDetails) == true && previousTab == main
@@ -178,6 +206,16 @@ fun BottomBar(
 
         NavigationBarItem(
             icon = {
+                val icon = if (currentTab == search) Icons.Filled.Search else Icons.Outlined.Search
+                Icon(icon, contentDescription = "Search", tint = bottomcolor, modifier = Modifier.size(32.dp))
+            },
+            label = { Text("Search") },
+            selected = false,
+            onClick = onSearchClick
+        )
+
+        NavigationBarItem(
+            icon = {
                 val icon = if (currentTab == myRecipes || recipeDetailScreenFromMyRecipes) R.drawable.bookmark_filled else R.drawable.bookmark_outlined
                 Icon(painterResource(icon), contentDescription = "My Recipes", tint = bottomcolor, modifier = Modifier.size(32.dp))
             },
@@ -194,16 +232,6 @@ fun BottomBar(
             label = { Text("Favorites") },
             selected = false,
             onClick = onFavoriteClick
-        )
-
-        NavigationBarItem(
-            icon = {
-                val icon = if (currentTab == settings) Icons.Filled.Settings else Icons.Outlined.Settings
-                Icon(icon, contentDescription = "Settings", tint = bottomcolor, modifier = Modifier.size(32.dp))
-            },
-            label = { Text("Settings") },
-            selected = false,
-            onClick = onSettingsClick
         )
     }
 }
