@@ -72,7 +72,8 @@ fun MainScreen(navController: NavController, recipes: List<Recipe>, categories: 
                     CustomSearchBar(searchQuery.value,
                         onSearchQueryChange = {query ->
                             searchQuery.value = query },
-                        navController = navController
+                        navController = navController,
+                        paddingValues = paddingValues
                     )
                 }
 
