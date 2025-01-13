@@ -63,13 +63,23 @@ fun CategoryRecipesScreen(
             .padding(horizontal = 16.dp)
     ) {
         CenterAlignedTopAppBar(
-            title = { Text("${category.title.replace("&amp;", "&")} Recipes", fontWeight = FontWeight.Bold) },
+            title = { Text(
+                "${category.title.replace("&amp;", "&")} Recipes",
+                fontWeight = FontWeight.Bold
+            ) },
             navigationIcon = {
                 IconButton(onClick = onBackButtonClick) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                 }
             }
         )
+
+        Text(
+            text = category.description,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+        )
+
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             verticalArrangement = Arrangement.spacedBy(16.dp),

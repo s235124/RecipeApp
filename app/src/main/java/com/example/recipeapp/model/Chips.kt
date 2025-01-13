@@ -19,8 +19,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.recipeapp.data.CategoryItem
 import com.example.recipeapp.data.RecipeAPI
@@ -45,6 +47,21 @@ fun Chips(
                 style = MaterialTheme.typography.headlineMedium,
                 color = Color.Black,
                 fontWeight = FontWeight.Bold
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(40.dp)
+        ) {
+            Text(
+                text = category.description.replace("&amp;", "&"),
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Black,
+                fontStyle = FontStyle.Italic,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
             )
         }
 
