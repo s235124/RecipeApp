@@ -75,7 +75,6 @@ class MainActivity : ComponentActivity() {
                 }
 
                 Scaffold (
-                    // TODO: FIGURE OUT WHAT TO DO WITH TOP BAR
                     bottomBar = {
                         BottomBar(
                             onHomeClick = {
@@ -105,6 +104,7 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
 //                    val tags = fetchData()
                     MainNavHost(
+                        paddingValues = innerPadding,
                         navController = navController,
                         onRouteChanged = { route ->
 //                            Log.d("RecipeApp", "Navigated to route: ${route.title}")

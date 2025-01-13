@@ -3,6 +3,12 @@ package com.example.recipeapp.navigation
 import android.net.Uri
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -25,6 +31,7 @@ import kotlinx.serialization.json.Json
 
 @Composable
 fun MainNavHost(
+    paddingValues: PaddingValues,
     navController: NavHostController,
     onRouteChanged: (Route) -> Unit,
     modifier: Modifier = Modifier,
@@ -46,6 +53,7 @@ fun MainNavHost(
         composable(Route.MainScreen.title) {
             onRouteChanged(Route.MainScreen)
             MainScreen(
+                paddingValues = paddingValues,
                 onCardClick = { recipe ->
                     val recipeJson = Uri.encode(Json.encodeToString(recipe))
                     println(recipeJson)
@@ -70,12 +78,21 @@ fun MainNavHost(
                 recipes = recipesFromAPI)
         }
 
-        composable("${Route.RecipeDetailScreen.title}/{recipeJson}") { backStackEntry ->
+        composable(
+            "${Route.RecipeDetailScreen.title}/{recipeJson}",
+            enterTransition = {
+                slideInHorizontally(initialOffsetX = { 1000 })// + fadeIn() // Slide in from the right
+            },
+            exitTransition = {
+                slideOutHorizontally(targetOffsetX = { 1000 })// + fadeOut() // Slide out to the left
+            }
+        ) { backStackEntry ->
             onRouteChanged(Route.RecipeDetailScreen)
             val recipeJson = backStackEntry.arguments?.getString("recipeJson") ?: ""
             val format = Json { ignoreUnknownKeys = true }
             val recipe = recipeJson.let {format.decodeFromString<RecipeItem>(Uri.decode(it))}
             RecipeDetailsFromAPIScreen(
+                innerPadding = paddingValues,
                 onBackButtonClick = { navController.popBackStack() },
                 recipe = recipe
             )
