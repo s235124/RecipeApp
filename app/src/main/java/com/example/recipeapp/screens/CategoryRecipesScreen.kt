@@ -3,6 +3,7 @@ package com.example.recipeapp.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,9 +13,11 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -38,106 +41,48 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.recipeapp.model.RecipeCard
 import com.example.recipeapp.data.Category
+import com.example.recipeapp.data.CategoryItem
+import com.example.recipeapp.data.Recipe
+import com.example.recipeapp.data.RecipeAPI
+import com.example.recipeapp.data.RecipeItem
+import com.example.recipeapp.model.RecipeCardFromAPI
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryRecipesScreen(
+    paddingValues: PaddingValues,
     onBackButtonClick: () -> Unit,
-    navController: NavController,
-    categoryName: String,
-    categories: List<Category>
+    onCardClick: (RecipeItem) -> Unit,
+    category: CategoryItem,
+    recipes: List<RecipeItem>,
 ) {
-    var searchQuery by remember { mutableStateOf("") }
-
-    // Find the selected category and its recipes
-    val category = categories.find { it.name.equals(categoryName, ignoreCase = true) }
-    val categoryRecipes = category?.recipes ?: emptyList()
-
-    // Filter recipes based on the search query
-    val filteredRecipes = categoryRecipes.filter {
-        it.name.contains(searchQuery, ignoreCase = true)
-    }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("$categoryName Recipes", fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
-                    }
+    Column(
+        modifier = Modifier
+            .padding(paddingValues)
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
+    ) {
+        CenterAlignedTopAppBar(
+            title = { Text("${category.title.replace("&amp;", "&")} Recipes", fontWeight = FontWeight.Bold) },
+            navigationIcon = {
+                IconButton(onClick = onBackButtonClick) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                 }
-            )
-        }
-    ) { paddingValues ->
-        Column(
+            }
+        )
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
-                .padding(paddingValues)
                 .fillMaxSize()
-                .padding(horizontal = 16.dp)
+                .padding(top = 16.dp)
         ) {
-            // Enhanced Search Bar
-            OutlinedTextField(
-                value = searchQuery,
-                onValueChange = { query -> searchQuery = query },
-                placeholder = { Text("Search ${categoryName} recipes...") },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search Icon",
-                        tint = Color.Gray
-                    )
-                },
-                trailingIcon = {
-                    if (searchQuery.isNotEmpty()) {
-                        IconButton(onClick = { searchQuery = "" }) {
-                            Icon(
-                                imageVector = Icons.Default.Clear,
-                                contentDescription = "Clear Search",
-                                tint = Color.Gray
-                            )
-                        }
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp)
-                    .height(56.dp)
-                    .clip(RoundedCornerShape(24.dp))
-                    .background(Color(0xFFF0F0F0)),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color.Gray,
-                    unfocusedBorderColor = Color.Gray,
-                    cursorColor = Color(0xFF78B17E)
-                ),
-                shape = RoundedCornerShape(24.dp),
-                singleLine = true
-            )
-
-            // Display filtered recipes
-            if (filteredRecipes.isEmpty()) {
-                Text(
-                    text = "No recipes found",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+            items(recipes) { recipe ->
+                RecipeCardFromAPI(
+                    recipe = recipe,
+                    onCardClick = { onCardClick(recipe) }
                 )
-            } else {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 16.dp)
-                ) {
-                    items(filteredRecipes) { recipe ->
-                        RecipeCard(
-                            recipe = TODO(),
-                            onNavigate = TODO(),
-                            modifier = TODO()
-                        )
-                    }
-                }
             }
         }
     }

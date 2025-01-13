@@ -3,9 +3,6 @@ package com.example.recipeapp.navigation
 import android.net.Uri
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideIn
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.PaddingValues
@@ -55,12 +52,10 @@ fun MainNavHost(
             MainScreen(
                 paddingValues = paddingValues,
                 onCardClick = { recipe ->
-                    val recipeJson = Uri.encode(Json.encodeToString(recipe))
-                    println(recipeJson)
-                    navController.navigate("${Route.RecipeDetailScreen.title}/${recipeJson}")
+                    navigateToRecipeDetails(navController, recipe)
                 },
-                onViewAllClick = {
-                    navController.navigate(Route.AllCategoriesScreen.title)
+                onViewAllClick = { categoryId ->
+                    navController.navigate("${Route.CategoryRecipesScreen.title}/${categoryId}")
                 },
                 recipes = recipesFromAPI,
                 categories = categoriesFromAPI
@@ -72,8 +67,7 @@ fun MainNavHost(
 
             SearchScreen(
                 onCardClick = { recipe ->
-                    val recipeJson = Uri.encode(Json.encodeToString(recipe))
-                    navController.navigate("${Route.RecipeDetailScreen.title}/${recipeJson}")
+                    navigateToRecipeDetails(navController, recipe)
                 },
                 recipes = recipesFromAPI)
         }
@@ -81,10 +75,10 @@ fun MainNavHost(
         composable(
             "${Route.RecipeDetailScreen.title}/{recipeJson}",
             enterTransition = {
-                slideInHorizontally(initialOffsetX = { 1000 })// + fadeIn() // Slide in from the right
+                slideInHorizontally(initialOffsetX = { 1000 }) // Slide in from the right
             },
-            exitTransition = {
-                slideOutHorizontally(targetOffsetX = { 1000 })// + fadeOut() // Slide out to the left
+            popExitTransition = {
+                slideOutHorizontally(targetOffsetX = { 1000 }) // Slide out to the left
             }
         ) { backStackEntry ->
             onRouteChanged(Route.RecipeDetailScreen)
@@ -108,21 +102,38 @@ fun MainNavHost(
             MyRecipesScreen(navController, categories)
         }
 
-        composable(Route.AllCategoriesScreen.title) {
+        composable(
+            Route.AllCategoriesScreen.title,
+            enterTransition = {
+                slideInHorizontally(initialOffsetX = { 1000 })// + fadeIn() // Slide in from the right
+            },
+            exitTransition = {
+                slideOutHorizontally(targetOffsetX = { 1000 })// + fadeOut() // Slide out to the left
+            }
+        ) {
             onRouteChanged(Route.AllCategoriesScreen)
             AllCategoriesScreen(navController, categories)
         }
 
-        composable("${Route.CategoryRecipesScreen.title}/{categoryName}") { backStackEntry ->
+        composable("${Route.CategoryRecipesScreen.title}/{categoryId}") { backStackEntry ->
             onRouteChanged(Route.CategoryRecipesScreen)
-            val categoryName = backStackEntry.arguments?.getString("categoryName") ?: ""
+            val categoryId = backStackEntry.arguments?.getString("categoryId") ?: ""
+            val category = categoriesFromAPI.items.filter { categoryItem -> categoryItem.uid == categoryId }[0]
+
+            val filteredRecipes = recipesFromAPI.items.filter { item -> item.categoriesIds?.contains(categoryId) == true }
+
             CategoryRecipesScreen(
-                onBackButtonClick = TODO(),
-                navController = TODO(),
-                categoryName = categoryName,
-                categories = TODO()
+                paddingValues = paddingValues,
+                onBackButtonClick = { navController.popBackStack() },
+                category = category,
+                onCardClick = {recipe -> navigateToRecipeDetails(navController, recipe) },
+                recipes = filteredRecipes,
             )
         }
     }
+}
 
+fun navigateToRecipeDetails(navController: NavHostController, recipe: RecipeItem) {
+    val recipeJson = Uri.encode(Json.encodeToString(recipe))
+    navController.navigate("${Route.RecipeDetailScreen.title}/${recipeJson}")
 }

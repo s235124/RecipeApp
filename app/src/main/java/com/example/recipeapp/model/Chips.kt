@@ -39,7 +39,6 @@ fun Chips(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(40.dp)
-                .padding(horizontal = 10.dp)
         ) {
             Text(
                 text = category.title.replace("&amp;", "&"),
@@ -52,13 +51,12 @@ fun Chips(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 10.dp)
                 .horizontalScroll(rememberScrollState()),
             verticalAlignment = Alignment.CenterVertically
         ) {
             var i = 0
             categoryRecipes.forEach { recipe ->
-                if (i >= 5) return
+                if (i >= 5) return@forEach
                 RecipeCardFromAPI(
                     recipe = recipe,
                     onCardClick = { onCardClick(recipe) },
@@ -67,7 +65,7 @@ fun Chips(
                 Spacer (modifier = Modifier.width(16.dp))
                 i++
             }
-            // Add a "View All Categories" button at the end
+            // Add a "View All Recipes" button at the end
             Button(
                 onClick = onViewAllClick,
                 colors = ButtonDefaults.buttonColors(
