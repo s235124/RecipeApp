@@ -43,11 +43,13 @@ fun MainNavHost(
         popEnterTransition = { EnterTransition.None },
         popExitTransition = { ExitTransition.None }
     ) {
-        composable(Route.MainScreen.title) { backStackEntry ->
+        composable(Route.MainScreen.title) {
             onRouteChanged(Route.MainScreen)
             MainScreen(
-                onCardClick = {
-                    navController.navigate("${Route.CategoryRecipesScreen.title}/")
+                onCardClick = { recipe ->
+                    val recipeJson = Uri.encode(Json.encodeToString(recipe))
+                    println(recipeJson)
+                    navController.navigate("${Route.RecipeDetailScreen.title}/${recipeJson}")
                 },
                 onViewAllClick = {
                     navController.navigate(Route.AllCategoriesScreen.title)
@@ -64,7 +66,7 @@ fun MainNavHost(
                 onCardClick = { recipe ->
                     val recipeJson = Uri.encode(Json.encodeToString(recipe))
                     navController.navigate("${Route.RecipeDetailScreen.title}/${recipeJson}")
-                              },
+                },
                 recipes = recipesFromAPI)
         }
 

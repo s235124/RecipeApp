@@ -61,54 +61,14 @@ fun MainScreen(
                     bottom = 80.dp), verticalArrangement = Arrangement.spacedBy(7.dp) //afstand fra hver recipe card
             ) {
                 //categories-sektion som en separat item
-                while (categories == null) {}
                 items(categories.items){ catItem ->
                     Chips(
                         category = catItem,
                         recipes = recipes,
-                        onCardClick = { onCardClick(it) },
+                        onCardClick = { recipe -> onCardClick(recipe) },
                         onViewAllClick = onViewAllClick
                     )
                 }
-
-//                //suggestions-overskrift som item
-//                item{
-//                    Text(text = "Suggestions",
-//                        style = MaterialTheme.typography.headlineMedium,
-//                        color = Color.Black,
-//                        fontWeight = FontWeight.Bold,
-//                        modifier = Modifier.padding(horizontal = 8.dp)
-//                    )
-//                }
-//
-//                items(recipes.chunked(2)){recipePair ->
-//                    Row(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(horizontal = 8.dp),
-//                        horizontalArrangement = Arrangement.spacedBy(8.dp) // Afstand mellem kort
-//                    ) {
-//                        recipePair.forEach { recipe ->
-//                            RecipeCard(
-//                                recipe = recipe,
-//                                onNavigate = { onNavigate(recipe.name) },
-//                                modifier = Modifier
-//                                    .width(180.dp) // Bredden for hvert kort
-//                                    .height(250.dp) // Højden for hvert kort
-//                                    .padding(vertical = 6.dp)
-//                            )
-//                        }
-//                        // Hvis der kun er én opskrift i rækken, tilføj en Spacer for at udfylde plads
-//                        if (recipePair.size < 2){
-//                            Spacer(
-//                                modifier = Modifier
-//                                    .width(150.dp)
-//                                    .height(200.dp)
-//                            )
-//                        }
-//                    }
-//                }
-
             }
         }
     )

@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
                 val previousTab = navController.previousBackStackEntry?.destination?.route
 
                 recipeAPI = fetchRecipesFromAPI()
-//                categoriesAPI = fetchCategoriesFromAPI()
+                categoriesAPI = fetchCategoriesFromAPI()
 
                 // Fetch recipes on startup
                 LaunchedEffect(Unit) {
