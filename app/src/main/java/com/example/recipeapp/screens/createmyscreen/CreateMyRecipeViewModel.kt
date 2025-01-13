@@ -5,23 +5,40 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.recipeapp.data.Recipe
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.example.recipeapp.data.getMyRecipes
+import com.example.recipeapp.data.saveMyRecipes
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import com.example.recipeapp.data.getMyRecipes
-import com.example.recipeapp.data.saveMyRecipes
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import com.example.recipeapp.data.getImageUri
+import kotlinx.coroutines.flow.firstOrNull
+
+
+
 
 class CreateMyRecipeViewModel(val context: Context) : ViewModel() {
+
+
 
     // StateFlow to observe the list of recipes
     private val _recipes = MutableStateFlow<List<Recipe>>(emptyList())
     val recipes: StateFlow<List<Recipe>> get() = _recipes
 
+
+    private val _imageUriFlow = MutableStateFlow<String?>(null)
+    val imageUriFlow = _imageUriFlow.asStateFlow() // Expose as read-only
+
+
+
+
     init {
         viewModelScope.launch {
             try {
                 _recipes.value = getMyRecipes(context).first()
+                val savedUri = getImageUri(context).firstOrNull()
+                _imageUriFlow.value = savedUri
             } catch (e: Exception) {
                 // Handle error gracefully (e.g., log error, show fallback UI)
                 _recipes.value = emptyList()
@@ -48,4 +65,12 @@ class CreateMyRecipeViewModel(val context: Context) : ViewModel() {
             }
         }
     }
+
+    fun saveImageUri(uri: String) {
+        viewModelScope.launch {
+            com.example.recipeapp.data.saveImageUriToDataStore(context, uri)// Save to DataStore
+            _imageUriFlow.value = uri // Update StateFlow
+        }
+    }
+
 }
