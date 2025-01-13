@@ -21,36 +21,34 @@ import com.example.recipeapp.data.Recipe
 
 @Composable
 fun Grids(recipes: List<Recipe>, modifier: Modifier = Modifier, navController: NavController) {
-    Column {
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .height(40.dp)
-                .padding(horizontal = 10.dp)
-        ) {
-            Text(
-                text = "Suggestions",
-                style = MaterialTheme.typography.headlineMedium,
-                color = Color.Black,
-                fontWeight = FontWeight.Bold
-            )
-        }
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            Modifier
-                .fillMaxSize()
-                .padding(8.dp)
-
-        ) {
-            items(recipes) { recipe ->
-                RecipeCard(
-                    recipe = recipe,
-                    navController = navController,
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .fillMaxWidth()
-                )
-            }
-        }
-    }
+//    Column {
+//        Box(
+//            Modifier
+//                .fillMaxWidth()
+//                .height(40.dp)
+//                .padding(horizontal = 10.dp)
+//        ) {
+//            Text(
+//                text = "Suggestions",
+//                style = MaterialTheme.typography.headlineMedium,
+//                color = Color.Black,
+//                fontWeight = FontWeight.Bold
+//            )
+//        }
+//        LazyVerticalGrid(
+//            columns = GridCells.Fixed(2),
+//            Modifier
+//                .fillMaxSize()
+//                .padding(8.dp)
+//
+//        ) {
+//            items(recipes) { recipe ->
+//                RecipeCard(
+//                    recipe = recipe,
+//                    onNavigate = TODO(),
+//                    modifier = TODO()
+//                )
+//            }
+//        }
+//    }
 }

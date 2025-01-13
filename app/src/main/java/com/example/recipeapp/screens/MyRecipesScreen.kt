@@ -110,11 +110,9 @@ fun MyRecipesScreen(
             ) {
                 items(filteredRecipes) { recipe ->
                     RecipeCard(
-                        recipe = recipe,
-                        navController = navController,
-                        modifier = Modifier
-                            .padding(horizontal = 8.dp)
-                            .fillMaxWidth()
+                        recipe = TODO(),
+                        onNavigate = TODO(),
+                        modifier = TODO()
                     )
                 }
             }

@@ -89,11 +89,9 @@ fun FavoritesScreen(navController: NavController, recipes: List<Recipe>) {
             ) {
                 items(filteredRecipes) { recipe ->
                     RecipeCard(
-                        recipe = recipe,
-                        navController = navController,
-                        modifier = Modifier
-                            .padding(horizontal = 8.dp)
-                            .fillMaxWidth()
+                        recipe = TODO(),
+                        onNavigate = TODO(),
+                        modifier = TODO()
                     )
                 }
             }

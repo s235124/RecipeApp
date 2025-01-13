@@ -38,9 +38,9 @@ import com.example.recipeapp.data.Category
 import com.example.recipeapp.data.CategoryAPI
 import com.example.recipeapp.data.Recipe
 import com.example.recipeapp.data.RecipeAPI
-import com.example.recipeapp.http.APITestingViewModel
 import com.example.recipeapp.navigation.MainNavHost
 import com.example.recipeapp.navigation.Route
+import com.example.recipeapp.screens.CategoriesViewModel
 import com.example.recipeapp.screens.RecipeViewModel
 import com.example.recipeapp.ui.theme.RecipeAppTheme
 import kotlinx.coroutines.launch
@@ -55,6 +55,7 @@ class MainActivity : ComponentActivity() {
                 val coroutineScope = rememberCoroutineScope()
 
                 var recipeAPI by remember { mutableStateOf(RecipeAPI()) }
+                var categoriesAPI by remember { mutableStateOf(CategoryAPI()) }
                 var recipes by remember { mutableStateOf(emptyList<Recipe>()) }
                 var categories by remember { mutableStateOf(emptyList<Category>()) }
 
@@ -63,6 +64,7 @@ class MainActivity : ComponentActivity() {
                 val previousTab = navController.previousBackStackEntry?.destination?.route
 
                 recipeAPI = fetchRecipesFromAPI()
+//                categoriesAPI = fetchCategoriesFromAPI()
 
                 // Fetch recipes on startup
                 LaunchedEffect(Unit) {
@@ -111,6 +113,7 @@ class MainActivity : ComponentActivity() {
                             .fillMaxSize()
                             .padding(innerPadding),
                         recipesFromAPI = recipeAPI,
+                        categoriesFromAPI = categoriesAPI,
                         recipes = recipes,
                         categories = categories
                     )
@@ -125,10 +128,21 @@ fun fetchRecipesFromAPI(): RecipeAPI {
     val viewModel: RecipeViewModel = viewModel() // Proper ViewModel instantiation
     val recipes by viewModel.data.collectAsState(initial = null) // Collect StateFlow
 
-//    println(recipeTags)
+    println(recipes)
 
     return if (recipes == null) RecipeAPI()
     else recipes as RecipeAPI
+}
+
+@Composable
+fun fetchCategoriesFromAPI(): CategoryAPI {
+    val viewModel: CategoriesViewModel = viewModel() // Proper ViewModel instantiation
+    val categories by viewModel.data.collectAsState(initial = null) // Collect StateFlow
+
+    println(categories)
+
+    return if (categories == null) CategoryAPI()
+    else categories as CategoryAPI
 }
 
 // Simulated functions to fetch recipes and categories

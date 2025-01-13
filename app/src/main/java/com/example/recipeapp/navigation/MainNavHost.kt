@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.recipeapp.data.Category
+import com.example.recipeapp.data.CategoryAPI
 import com.example.recipeapp.data.Recipe
 import com.example.recipeapp.data.RecipeAPI
 import com.example.recipeapp.data.RecipeItem
@@ -17,7 +18,6 @@ import com.example.recipeapp.screens.CategoryRecipesScreen
 import com.example.recipeapp.screens.FavoritesScreen
 import com.example.recipeapp.screens.MainScreen
 import com.example.recipeapp.screens.MyRecipesScreen
-import com.example.recipeapp.screens.RecipeDetailScreen
 import com.example.recipeapp.screens.RecipeDetailsFromAPIScreen
 import com.example.recipeapp.screens.SearchScreen
 import kotlinx.serialization.encodeToString
@@ -31,6 +31,7 @@ fun MainNavHost(
 //    favorites: MutableList<Recipe>, TODO: ADD THESE BACK LATER ON
 //    onSaveFavorites: (List<Recipe>) -> Unit,
     recipesFromAPI: RecipeAPI,
+    categoriesFromAPI: CategoryAPI,
     recipes: List<Recipe>, // TODO: REMOVE WHEN RECIPES FROM API IS FULLY CHANGED IN ALL THE MODEL CLASSES
     categories: List<Category>
 ) {
@@ -42,9 +43,18 @@ fun MainNavHost(
         popEnterTransition = { EnterTransition.None },
         popExitTransition = { ExitTransition.None }
     ) {
-        composable(Route.MainScreen.title) {
+        composable(Route.MainScreen.title) { backStackEntry ->
             onRouteChanged(Route.MainScreen)
-            MainScreen(navController, recipes, categories)
+            MainScreen(
+                onCardClick = {
+                    navController.navigate("${Route.CategoryRecipesScreen.title}/")
+                },
+                onViewAllClick = {
+                    navController.navigate(Route.AllCategoriesScreen.title)
+                },
+                recipes = recipesFromAPI,
+                categories = categoriesFromAPI
+            )
         }
 
         composable(Route.SearchScreen.title) {
@@ -87,7 +97,12 @@ fun MainNavHost(
         composable("${Route.CategoryRecipesScreen.title}/{categoryName}") { backStackEntry ->
             onRouteChanged(Route.CategoryRecipesScreen)
             val categoryName = backStackEntry.arguments?.getString("categoryName") ?: ""
-            CategoryRecipesScreen(navController, categoryName, categories)
+            CategoryRecipesScreen(
+                onBackButtonClick = TODO(),
+                navController = TODO(),
+                categoryName = categoryName,
+                categories = TODO()
+            )
         }
     }
 

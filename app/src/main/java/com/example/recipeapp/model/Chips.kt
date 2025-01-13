@@ -25,11 +25,18 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.example.recipeapp.data.Category
+import com.example.recipeapp.data.CategoryItem
+import com.example.recipeapp.data.RecipeAPI
+import com.example.recipeapp.data.RecipeItem
 
 @Composable
-fun Chips(categories: List<Category>, onCategoryClick: (String) -> Unit, onViewAllClick: () -> Unit ) {
+fun Chips(
+    category: CategoryItem,
+    recipes: RecipeAPI,
+    onCardClick: (RecipeItem) -> Unit,
+    onViewAllClick: () -> Unit
+) {
+    val categoryRecipes = recipes.items.filter { recipe -> recipe.categoriesIds?.contains(category.uid) == true }
     Column {
         Box(
             modifier = Modifier
@@ -38,7 +45,7 @@ fun Chips(categories: List<Category>, onCategoryClick: (String) -> Unit, onViewA
                 .padding(horizontal = 10.dp)
         ) {
             Text(
-                text = "Categories",
+                text = category.title,
                 style = MaterialTheme.typography.headlineMedium,
                 color = Color.Black,
                 fontWeight = FontWeight.Bold
@@ -51,40 +58,46 @@ fun Chips(categories: List<Category>, onCategoryClick: (String) -> Unit, onViewA
                 .padding(horizontal = 10.dp)
                 .horizontalScroll(rememberScrollState())
         ) {
-            categories.forEach { category ->
-                Column(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .clickable { onCategoryClick(category.name) },
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-
-                    // Display the flag with rounded corners
-                    Image(
-                        painter = painterResource(id = category.flagResId),
-                        contentDescription = "${category.name} flag",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(60.dp)
-                            .clip(RoundedCornerShape(16.dp)) // Rounded corners
-                            .background(Color.White),
-
-                        )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Display the category name
-                    Text(
-                        text = category.name,
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
-                }
+            var i = 0
+            categoryRecipes.forEach { recipe ->
+                if (i >= 5) return
+//                Column(
+//                    modifier = Modifier
+//                        .padding(8.dp)
+//                        .clickable { onCardClick(recipe.name) },
+//                    horizontalAlignment = Alignment.CenterHorizontally
+//                ) {
+//
+//                    // Display the flag with rounded corners
+//                    Image(
+//                        painter = painterResource(id = recipe.flagResId),
+//                        contentDescription = "${recipe.name} flag",
+//                        contentScale = ContentScale.Crop,
+//                        modifier = Modifier
+//                            .size(60.dp)
+//                            .clip(RoundedCornerShape(16.dp)) // Rounded corners
+//                            .background(Color.White)
+//                    )
+//
+//                    Spacer(modifier = Modifier.height(8.dp))
+//
+//                    // Display the category name
+//                    Text(
+//                        text = recipe.name,
+//                        style = MaterialTheme.typography.bodySmall,
+//                        fontWeight = FontWeight.Bold,
+//                        color = Color.Black
+//                    )
+//                }
+                RecipeCardFromAPI(
+                    recipe = recipe,
+                    onCardClick = { onCardClick(recipe) }
+                )
+                i++
             }
             // Add a "View All Categories" button at the end
             Text(
-                text = "View All Categories",
+                text = "View All Recipes",
                 style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
                 color = Color(0xFF78B17E),
                 modifier = Modifier

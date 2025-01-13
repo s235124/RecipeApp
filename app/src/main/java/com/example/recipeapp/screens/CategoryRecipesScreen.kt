@@ -42,6 +42,7 @@ import com.example.recipeapp.data.Category
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryRecipesScreen(
+    onBackButtonClick: () -> Unit,
     navController: NavController,
     categoryName: String,
     categories: List<Category>
@@ -131,11 +132,9 @@ fun CategoryRecipesScreen(
                 ) {
                     items(filteredRecipes) { recipe ->
                         RecipeCard(
-                            recipe = recipe,
-                            navController = navController,
-                            modifier = Modifier
-                                .padding(horizontal = 8.dp)
-                                .fillMaxWidth()
+                            recipe = TODO(),
+                            onNavigate = TODO(),
+                            modifier = TODO()
                         )
                     }
                 }
