@@ -17,7 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.recipeapp.RecipeCard
+import com.example.recipeapp.model.RecipeCard
 import com.example.recipeapp.data.Recipe
 
 @Composable

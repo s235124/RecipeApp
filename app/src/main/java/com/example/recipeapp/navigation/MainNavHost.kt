@@ -32,8 +32,8 @@ fun MainNavHost(
     navController: NavHostController,
     onRouteChanged: (Route) -> Unit,
     modifier: Modifier = Modifier,
-//    favorites: MutableList<Recipe>, TODO: ADD THESE BACK LATER ON
-//    onSaveFavorites: (List<Recipe>) -> Unit,
+    //favorites: MutableList<Recipe>, //TODO: ADD THESE BACK LATER ON
+    //onSaveFavorites: (List<Recipe>) -> Unit,
     recipesFromAPI: RecipeAPI,
     recipes: List<Recipe>, // TODO: REMOVE WHEN RECIPES FROM API IS FULLY CHANGED IN ALL THE MODEL CLASSES
     categories: List<Category>
@@ -58,58 +58,59 @@ fun MainNavHost(
                 onCardClick = { recipe ->
                     val recipeJson = Uri.encode(Json.encodeToString(recipe))
                     navController.navigate("${Route.RecipeDetailScreen.title}/${recipeJson}")
-                              },
-                recipes = recipesFromAPI)
+                },
+                recipes = recipesFromAPI
+            )
         }
 
         composable("${Route.RecipeDetailScreen.title}/{recipeName}") { backStackEntry ->
             val recipeName = backStackEntry.arguments?.getString("recipeName") ?: ""
             val recipe = recipes.find { it.name == recipeName }
             if (recipe != null) {
-               // Route.RecipeDetailScreen(navController = navController, recipe = recipe)
+                // Route.RecipeDetailScreen(navController = navController, recipe = recipe)
             } else {
-                Text("Recipe not found!", modifier = Modifier.fillMaxSize(), textAlign = TextAlign.Center)
+                Text(
+                    "Recipe not found!",
+                    modifier = Modifier.fillMaxSize(),
+                    textAlign = TextAlign.Center
+                )
             }
-        composable("${Route.RecipeDetailScreen.title}/{recipeJson}") { backStackEntry ->
-            onRouteChanged(Route.RecipeDetailScreen)
-            val recipeJson = backStackEntry.arguments?.getString("recipeJson") ?: ""
-            val format = Json { ignoreUnknownKeys = true }
-            val recipe = recipeJson.let {format.decodeFromString<RecipeItem>(Uri.decode(it))}
-            RecipeDetailsFromAPIScreen(
-                onBackButtonClick = { navController.popBackStack() },
-                recipe = recipe
-            )
         }
+            composable("${Route.RecipeDetailScreen.title}/{recipeJson}") { backStackEntry ->
+                onRouteChanged(Route.RecipeDetailScreen)
+                val recipeJson = backStackEntry.arguments?.getString("recipeJson") ?: ""
+                val format = Json { ignoreUnknownKeys = true }
+                val recipe = recipeJson.let { format.decodeFromString<RecipeItem>(Uri.decode(it)) }
+                RecipeDetailsFromAPIScreen(
+                    onBackButtonClick = { navController.popBackStack() },
+                    recipe = recipe
+                )
+            }
 
-        composable(Route.FavouritesScreen.title) {
-            onRouteChanged(Route.FavouritesScreen)
-            FavoritesScreen(navController,recipes)
-        }
+            composable(Route.FavouritesScreen.title) {
+                onRouteChanged(Route.FavouritesScreen)
+                FavoritesScreen(navController, recipes)
+            }
 
-        composable(Route.MyRecipesScreen.title) {
-            onRouteChanged(Route.MyRecipesScreen)
-            MyRecipesScreen(navController)
-        }
+            composable(Route.MyRecipesScreen.title) {
+                onRouteChanged(Route.MyRecipesScreen)
+                MyRecipesScreen(navController)
+            }
 
-        composable(Route.AllCategoriesScreen.title) {
-            onRouteChanged(Route.AllCategoriesScreen)
-            AllCategoriesScreen(navController, categories)
-        }
+            composable(Route.AllCategoriesScreen.title) {
+                onRouteChanged(Route.AllCategoriesScreen)
+                AllCategoriesScreen(navController, categories)
+            }
 
-        composable("${Route.CategoryRecipesScreen.title}/{categoryName}") { backStackEntry ->
-            onRouteChanged(Route.CategoryRecipesScreen)
-            val categoryName = backStackEntry.arguments?.getString("categoryName") ?: ""
-            CategoryRecipesScreen(navController, categoryName, categories)
-        }
+            composable("${Route.CategoryRecipesScreen.title}/{categoryName}") { backStackEntry ->
+                onRouteChanged(Route.CategoryRecipesScreen)
+                val categoryName = backStackEntry.arguments?.getString("categoryName") ?: ""
+                CategoryRecipesScreen(navController, categoryName, categories)
+            }
 
-        composable(Route.SettingsScreen.title) {
-            onRouteChanged(Route.SettingsScreen)
-            SettingsScreen(navController)
-        }
-        composable(Route.CreateMyRecipe.title) {
-            onRouteChanged(Route.CreateMyRecipe)
-            CreateMyRecipe(navController)
+            composable(Route.CreateMyRecipe.title) {
+                onRouteChanged(Route.CreateMyRecipe)
+                CreateMyRecipe(navController)
+            }
         }
     }
-
-}

@@ -1,4 +1,4 @@
-package com.example.recipeapp
+package com.example.recipeapp.model
 
 import android.net.Uri
 import androidx.compose.foundation.Image
@@ -26,24 +26,7 @@ import com.example.recipeapp.navigation.Route
 fun RecipeCard(recipe: Recipe, navController: NavController, modifier: Modifier) {
     val cardBackgroundColor = Color(0xFF78B17E)
 
-    Card(
-        modifier = modifier
-    /*Card(
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth()
-            .clickable {
-                navController.navigate("${Route.RecipeDetailScreen.title}/${recipe.name}")
-            },
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = cardBackgroundColor)
-    ) {
 
-    )*/   // Ikke korrekt tilgang at "låse" designet/modifier af recipe card ved selve klassen. Det skal
-          // ske ved der hvor vi kalder funktionen (hvilket er fra MainScreen).
-          // En notat som kan hjælpe os i fremtiden probably :)
-          // Korrekt tilgang er i nedstående kode.
 
     Card(
         modifier = modifier.clickable {
@@ -78,13 +61,7 @@ fun RecipeCard(recipe: Recipe, navController: NavController, modifier: Modifier)
                         .height(150.dp)
                 )
             }
-            else {
-                Image(
-                    painter = painterResource(id = R.drawable.oip), // Use a placeholder image
-                    contentDescription = "Placeholder",
-                    modifier = Modifier.fillMaxWidth().height(150.dp)
-                )
-            }
+
 
             Spacer(modifier = Modifier.height(8.dp))
             Text(
