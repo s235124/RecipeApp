@@ -7,6 +7,11 @@ coreKtxVersion = "1.12.0"
 datastorePreferences = "1.1.1"
 googleAccompanistGlide = "0.29.1"
 googleAccompanistGlideVersion = "<latest_version>"
+coilCompose = "2.0.0"
+coreKtxVersion = "1.12.0"
+datastorePreferences = "1.1.1"
+googleAccompanistGlide = "0.29.1"
+googleAccompanistGlideVersion = "<latest_version>"
 gson = "2.10.1"
 kotlin = "1.9.0"
 coreKtx = "1.13.1"
@@ -23,6 +28,10 @@ activityKtx = "1.9.3"
 datastoreCoreAndroid = "1.1.1"
 datastorePreferencesCoreJvm = "1.1.1"
 transportationConsumer = "3.0.0"
+datastoreCoreAndroid = "1.1.1"
+datastorePreferencesCoreJvm = "1.1.1"
+retrofit = "2.9.0"
+retrofit2KotlinxSerializationConverter = "0.8.0"
 
 [libraries]
 accompanist-glide = { module = "com.google.accompanist:accompanist-glide", version.ref = "accompanistGlide" }
@@ -34,6 +43,7 @@ androidx-core-ktx-v1120 = { module = "androidx.core:core-ktx", version.ref = "co
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -54,8 +64,12 @@ androidx-datastore-core-android = { group = "androidx.datastore", name = "datast
 androidx-datastore-preferences-core-jvm = { group = "androidx.datastore", name = "datastore-preferences-core-jvm", version.ref = "datastorePreferencesCoreJvm" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 transportation-consumer = { group = "com.google.android.libraries.mapsplatform.transportation", name = "transportation-consumer", version.ref = "transportationConsumer" }
+androidx-datastore-core-android = { group = "androidx.datastore", name = "datastore-core-android", version.ref = "datastoreCoreAndroid" }
+androidx-datastore-preferences-core-jvm = { group = "androidx.datastore", name = "datastore-preferences-core-jvm", version.ref = "datastorePreferencesCoreJvm" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+retrofit2-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "retrofit2KotlinxSerializationConverter" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-

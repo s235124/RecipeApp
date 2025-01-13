@@ -28,6 +28,8 @@ fun RecipeCard(recipe: Recipe, navController: NavController, modifier: Modifier)
 
     Card(
         modifier = modifier
+    /*Card(
+        modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
             .clickable {
@@ -37,6 +39,21 @@ fun RecipeCard(recipe: Recipe, navController: NavController, modifier: Modifier)
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = cardBackgroundColor)
     ) {
+
+    )*/   // Ikke korrekt tilgang at "låse" designet/modifier af recipe card ved selve klassen. Det skal
+          // ske ved der hvor vi kalder funktionen (hvilket er fra MainScreen).
+          // En notat som kan hjælpe os i fremtiden probably :)
+          // Korrekt tilgang er i nedstående kode.
+
+    Card(
+        modifier = modifier.clickable {
+            navController.navigate("${Route.RecipeDetailScreen.title}/${recipe.name}")
+        },
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = cardBackgroundColor)
+    )
+    {
         Column(
             modifier = Modifier.padding(0.dp),
             horizontalAlignment = Alignment.CenterHorizontally

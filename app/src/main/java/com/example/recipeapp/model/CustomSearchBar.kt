@@ -1,5 +1,6 @@
 package com.example.recipeapp.model
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,11 +22,17 @@ import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CustomSearchBar(searchQuery: String, onSearchQueryChange: (String) -> Unit, navController: NavController, showNavigation: Boolean = true) {
+fun CustomSearchBar(
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    navController: NavController,
+    showNavigation: Boolean = true,
+    paddingValues: PaddingValues
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(paddingValues)
             .height(50.dp)
     ) {
         OutlinedTextField(
@@ -35,7 +42,7 @@ fun CustomSearchBar(searchQuery: String, onSearchQueryChange: (String) -> Unit, 
 
                 // If showNavigation is true, navigate to search screen on query change
                 if (showNavigation && query.isNotEmpty()) {
-                    navController.navigate("search/$query")
+
                 }
 
             },

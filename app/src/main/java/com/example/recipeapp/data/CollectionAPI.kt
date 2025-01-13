@@ -3,17 +3,18 @@ package com.example.recipeapp.data
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CategoryAPI(
-    val items: ArrayList<CategoryItem>
+data class CollectionAPI(
+    val items: ArrayList<CollectionItem>
 ) {
-    constructor() : this(ArrayList())
+    constructor():this(ArrayList<CollectionItem>())
 }
 
 @Serializable
-data class CategoryItem(
+data class CollectionItem(
     val uid: String,
     val title: String,
     val thumbnailUrl: String,
     val description: String,
-    val collectionsCount: Int
+    val recipesCount: Int,
+    val categoryId: String
 )
