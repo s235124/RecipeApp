@@ -45,11 +45,13 @@ import com.example.recipeapp.screens.createmyscreen.CreateMyRecipeViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.res.painterResource
+import com.example.recipeapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun CreateMyRecipe(navController: NavController) {
+fun CreateMyRecipe(onSaveClick: () -> Unit) {
     val context = LocalContext.current
     val viewModel: CreateMyRecipeViewModel =
         viewModel(factory = CreateMyRecipeViewModelFactory(context))
@@ -149,7 +151,7 @@ fun CreateMyRecipe(navController: NavController) {
                             ingredient = ingredients
                         )
                     )
-                    navController.popBackStack()
+                    onSaveClick()
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {

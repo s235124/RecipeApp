@@ -7,7 +7,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
 
 object RetrofitInstance {
-    private const val BASE_URL = "https://edgl9.wiremockapi.cloud/"
+    private const val BASE_URL = "https://recipeapp.wiremockapi.cloud/"
 
     @OptIn(ExperimentalSerializationApi::class)
     private val retrofit by lazy {

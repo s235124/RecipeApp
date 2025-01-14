@@ -42,7 +42,6 @@ import com.example.recipeapp.navigation.MainNavHost
 import com.example.recipeapp.navigation.Route
 import com.example.recipeapp.screens.CategoriesViewModel
 import com.example.recipeapp.screens.RecipeViewModel
-import com.example.recipeapp.navigation.MainNavHost
 import com.example.recipeapp.ui.theme.RecipeAppTheme
 import kotlinx.coroutines.launch
 
@@ -198,10 +197,11 @@ fun BottomBar(
     val myRecipes = Route.MyRecipesScreen.title
     val favorites = Route.FavouritesScreen.title
     val search = Route.SearchScreen.title
+    val recipeDetailsFromAPI = Route.RecipeDetailFromAPIScreen.title
     val recipeDetails = Route.RecipeDetailScreen.title
 
-    val recipeDetailScreenFromHome = currentTab?.contains(recipeDetails) == true && previousTab == main
-    val recipeDetailScreenFromFavorites = currentTab?.contains(recipeDetails) == true && previousTab == favorites
+    val recipeDetailScreenFromHome = currentTab?.contains(recipeDetailsFromAPI) == true && previousTab == main
+    val recipeDetailScreenFromFavorites = currentTab?.contains(recipeDetailsFromAPI) == true && previousTab == favorites
     val recipeDetailScreenFromMyRecipes = currentTab?.contains(recipeDetails) == true && previousTab == myRecipes
 
     NavigationBar(

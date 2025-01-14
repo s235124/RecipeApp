@@ -7,6 +7,7 @@ data class RecipeAPI(
     val items: ArrayList<RecipeItem>
 ) {
     constructor() : this(ArrayList())
+
 }
 
 @Serializable

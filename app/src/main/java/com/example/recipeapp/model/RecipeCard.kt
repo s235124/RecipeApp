@@ -17,17 +17,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.recipeapp.R
 import com.example.recipeapp.data.Recipe
-import com.example.recipeapp.data.RecipeAPI
-import com.example.recipeapp.navigation.Route
 
 @Composable
 fun RecipeCard(
-    recipe: RecipeAPI,
-    onNavigate: (String) -> Unit,
-    modifier: Modifier
+    recipe: Recipe,
+    onNavigateToRecipeDetailScreen: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val cardBackgroundColor = Color(0xFF78B17E)
 
@@ -35,13 +33,12 @@ fun RecipeCard(
 
     Card(
         modifier = modifier.clickable {
-            navController.navigate("${Route.RecipeDetailScreen.title}/${recipe.name}")
+            onNavigateToRecipeDetailScreen()
         },
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = cardBackgroundColor)
-    )
-    {
+    ) {
         Column(
             modifier = Modifier.padding(0.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -59,6 +56,16 @@ fun RecipeCard(
             } else if (recipe.imageUri != null) {
                 Image(
                     painter = rememberAsyncImagePainter(model = Uri.parse(recipe.imageUri)),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp)
+                )
+            }
+            else {
+                Image(
+                    painter = painterResource(R.drawable.oip),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier

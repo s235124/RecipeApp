@@ -81,6 +81,7 @@ fun RecipeDetailsFromAPIScreen(
                 if (recipe.preparationTime != null && recipe.cookingTime != null) append("${recipe.preparationTime} + ${recipe.cookingTime}")
                 else if (recipe.preparationTime != null) append("${recipe.preparationTime}")
                 else if (recipe.cookingTime != null) append("${recipe.cookingTime}")
+                else {append("N/A"); return@buildString}
                 append(" min")
             }
 

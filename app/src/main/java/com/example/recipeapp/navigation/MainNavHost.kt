@@ -1,17 +1,14 @@
 package com.example.recipeapp.navigation
 
-import android.net.Uri
 import CreateMyRecipe
+import android.net.Uri
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -24,7 +21,8 @@ import com.example.recipeapp.screens.AllCategoriesScreen
 import com.example.recipeapp.screens.CategoryRecipesScreen
 import com.example.recipeapp.screens.FavoritesScreen
 import com.example.recipeapp.screens.MainScreen
-import com.example.recipeapp.screens.MyRecipesScreen
+import com.example.recipeapp.screens.RecipeDetailScreen
+import com.example.recipeapp.screens.recipe.MyRecipesScreen
 import com.example.recipeapp.screens.RecipeDetailsFromAPIScreen
 import com.example.recipeapp.screens.SearchScreen
 import kotlinx.serialization.encodeToString
@@ -56,7 +54,7 @@ fun MainNavHost(
             MainScreen(
                 paddingValues = paddingValues,
                 onCardClick = { recipe ->
-                    navigateToRecipeDetails(navController, recipe)
+                    navigateToAPIRecipeDetails(navController, recipe)
                 },
                 onViewAllClick = { categoryId ->
                     navController.navigate("${Route.CategoryRecipesScreen.title}/${categoryId}")
@@ -71,9 +69,29 @@ fun MainNavHost(
 
             SearchScreen(
                 onCardClick = { recipe ->
-                    navigateToRecipeDetails(navController, recipe)
+                    navigateToAPIRecipeDetails(navController, recipe)
                 },
                 recipes = recipesFromAPI)
+        }
+
+        composable(
+            "${Route.RecipeDetailFromAPIScreen.title}/{recipeJson}",
+            enterTransition = {
+                slideInHorizontally(initialOffsetX = { 1000 }) // Slide in from the right
+            },
+            popExitTransition = {
+                slideOutHorizontally(targetOffsetX = { 1000 }) // Slide out to the left
+            }
+        ) { backStackEntry ->
+            onRouteChanged(Route.RecipeDetailFromAPIScreen)
+            val recipeJson = backStackEntry.arguments?.getString("recipeJson") ?: ""
+            val format = Json { ignoreUnknownKeys = true }
+            val recipe = recipeJson.let {format.decodeFromString<RecipeItem>(Uri.decode(it))}
+            RecipeDetailsFromAPIScreen(
+                innerPadding = paddingValues,
+                onBackButtonClick = { navController.popBackStack() },
+                recipe = recipe
+            )
         }
 
         composable(
@@ -88,22 +106,35 @@ fun MainNavHost(
             onRouteChanged(Route.RecipeDetailScreen)
             val recipeJson = backStackEntry.arguments?.getString("recipeJson") ?: ""
             val format = Json { ignoreUnknownKeys = true }
-            val recipe = recipeJson.let {format.decodeFromString<RecipeItem>(Uri.decode(it))}
-            RecipeDetailsFromAPIScreen(
+            val recipe = recipeJson.let {format.decodeFromString<Recipe>(Uri.decode(it))}
+            RecipeDetailScreen(
                 innerPadding = paddingValues,
                 onBackButtonClick = { navController.popBackStack() },
                 recipe = recipe
             )
         }
 
-            composable(Route.FavouritesScreen.title) {
-                onRouteChanged(Route.FavouritesScreen)
-                FavoritesScreen(navController, recipes)
-            }
+        composable(Route.FavouritesScreen.title) {
+            onRouteChanged(Route.FavouritesScreen)
+            FavoritesScreen(
+                onNavigateToRecipeDetailScreen = {
+                    navController.navigate(Route.CreateMyRecipeScreen.title)
+                },
+                recipes = recipes
+            )
+        }
 
         composable(Route.MyRecipesScreen.title) {
             onRouteChanged(Route.MyRecipesScreen)
-            MyRecipesScreen(navController, categories)
+            MyRecipesScreen(
+                onNewMyRecipeClick = {
+                    navController.navigate(Route.CreateMyRecipeScreen.title)
+                },
+                onNavigateToRecipeDetailScreen = { recipe ->
+                    val recipeJson = Uri.encode(Json.encodeToString(recipe))
+                    navController.navigate("${Route.RecipeDetailScreen.title}/${recipeJson}")
+                }
+            )
         }
 
         composable(
@@ -130,14 +161,19 @@ fun MainNavHost(
                 paddingValues = paddingValues,
                 onBackButtonClick = { navController.popBackStack() },
                 category = category,
-                onCardClick = {recipe -> navigateToRecipeDetails(navController, recipe) },
+                onCardClick = {recipe -> navigateToAPIRecipeDetails(navController, recipe) },
                 recipes = filteredRecipes,
             )
+        }
+
+        composable(Route.CreateMyRecipeScreen.title) {
+            onRouteChanged(Route.CreateMyRecipeScreen)
+            CreateMyRecipe(onSaveClick = { navController.popBackStack() })
         }
     }
 }
 
-fun navigateToRecipeDetails(navController: NavHostController, recipe: RecipeItem) {
+fun navigateToAPIRecipeDetails(navController: NavHostController, recipe: RecipeItem) {
     val recipeJson = Uri.encode(Json.encodeToString(recipe))
-    navController.navigate("${Route.RecipeDetailScreen.title}/${recipeJson}")
+    navController.navigate("${Route.RecipeDetailFromAPIScreen.title}/${recipeJson}")
 }

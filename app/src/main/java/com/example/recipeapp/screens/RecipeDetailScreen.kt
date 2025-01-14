@@ -1,17 +1,22 @@
 package com.example.recipeapp.screens
 
 import android.annotation.SuppressLint
+import android.media.Image
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,57 +28,106 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
+import com.example.recipeapp.R
 import com.example.recipeapp.data.Recipe
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecipeDetailScreen(onBackButtonClick: () -> Unit, recipe: Recipe) {
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(recipe.name) },
-                navigationIcon = {
-                    IconButton(onClick = onBackButtonClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null
-                        )
-                    }
-                }
-            )
-        }
-
+fun RecipeDetailScreen(
+    innerPadding: PaddingValues,
+    onBackButtonClick: () -> Unit,
+    recipe: Recipe
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            if (recipe.imageUri != null) {
-                Image(
-                    painter = rememberAsyncImagePainter(model = recipe.imageUri),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clip(CircleShape)
-                        .align(Alignment.CenterHorizontally)
+        LazyColumn {
+            item {
+                CenterAlignedTopAppBar(
+                    title = { Text("Recipe Details") },
+                    navigationIcon = {
+                        IconButton(onClick = onBackButtonClick) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = null
+                            )
+                        }
+                    }
                 )
             }
-            Text(text = "Time: ${recipe.time}")
-            Text(text = "Difficulty: ${recipe.difficulty}")
-            Text(text = "Calories: ${recipe.calories}")
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "Description:", style = MaterialTheme.typography.titleMedium)
-            Text(text = recipe.description)
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "Ingredients:", style = MaterialTheme.typography.titleMedium)
-            recipe.ingredient.forEach { ingredient ->
-                Text(text = "- $ingredient")
+            item {
+                val img: Painter = if (recipe.imageUri == null) {
+                    painterResource(R.drawable.oip)
+                } else {
+                    rememberAsyncImagePainter(model = recipe.imageUri)
+                }
+
+                Image(
+                    painter = img,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth(),
+//                        .size(100.dp),
+                    alignment = Alignment.Center
+                )
+
+            }
+
+            item {
+                Text(
+                    text = "${recipe.time} | ${recipe.difficulty} | ${recipe.calories} kcal",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            item {
+                Text(
+                    text = "Description",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = recipe.description.replace("�", "% "),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            item {
+                Text(
+                    text = "Ingredients",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                for (ingredient in recipe.ingredient) {
+                    Text(
+                        text = "• $ingredient",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }
