@@ -2,6 +2,7 @@ import android.annotation.SuppressLint
 import android.app.TimePickerDialog
 import android.content.Context
 import android.net.Uri
+import android.widget.NumberPicker
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -45,6 +46,8 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.recipeapp.data.Recipe
 import com.example.recipeapp.screens.createmyscreen.CreateMyRecipeViewModel
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.foundation.layout.Row
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -83,23 +86,13 @@ fun CreateMyRecipe(onSaveClick: () -> Unit) {
 
     //Logik for knappene på skærmen  (tids- og sværhedsvælger)
 
-    //Tidvælger-dialog
+
     if (showTimePicker) {
-        LaunchedEffect(Unit) {
-            TimePickerDialog(
-                context,
-                { _, hourOfDay, minute ->
-                    val formattedTime = String.format("%02d:%02d", hourOfDay, minute)
-                    time = formattedTime
-                    showTimePicker = false // Luk dialogen
-                },
-                0, 0, true //24 hour format
-            ).apply {
-                setOnCancelListener {
-                    showTimePicker = false
-                }
-            }.show()
-        }
+        TimePickerDialo(
+            onDismiss = { showTimePicker = false },
+            onTimeSelected = { selectedTime ->
+                time = selectedTime }
+        )
     }
 
     if (showDifficultyDialog) {
@@ -111,7 +104,7 @@ fun CreateMyRecipe(onSaveClick: () -> Unit) {
         )
     }
 
-
+    //---------------------------
 
     Column(
             modifier = Modifier
@@ -143,14 +136,13 @@ fun CreateMyRecipe(onSaveClick: () -> Unit) {
             modifier = Modifier.fillMaxWidth()
         )
 
-        //Tidvælger-knap
+
         Button(
             onClick = { showTimePicker = true },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(time) //Viser valgt tid or standardtekst
         }
-
 
         //Sværhedsgrad knap
         Button(
@@ -238,6 +230,71 @@ class CreateMyRecipeViewModelFactory(private val context: Context) : ViewModelPr
     }
 }
 
+//Selveste rullehjulet for at vælgge tid
+@Composable
+fun TimePickerDialo(
+    onDismiss: () -> Unit,
+    onTimeSelected: (String) ->Unit
+)  {
+    var selectedHour by remember { mutableStateOf(0) }
+    var selectedMinute by remember { mutableStateOf(0) }
+
+    AlertDialog(onDismissRequest = { onDismiss()},
+        title = {Text("Select Time")},
+        text = {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ){
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically
+                ){
+                    Column(horizontalAlignment =Alignment.CenterHorizontally){
+                      Text("Hours")
+                       AndroidView(
+                            factory = {context ->
+                                NumberPicker(context).apply{
+                                    minValue = 0
+                                    maxValue = 23
+                                    value = selectedHour
+                                    setOnValueChangedListener { _, _, newVal ->
+                                        selectedHour = newVal  }
+                                }
+                            },
+                            modifier = Modifier.size(100.dp, 150.dp)  )
+                    }
+
+
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("Minutes")
+                        AndroidView(
+                            factory = { context ->
+                                NumberPicker(context).apply {
+                                    minValue = 0
+                                    maxValue = 59
+                                    value = selectedMinute
+                                    setOnValueChangedListener { _, _, newVal ->
+                                        selectedMinute = newVal
+                                    }
+                                }
+
+                            },
+                            modifier = Modifier.size(100.dp, 150.dp) )  }
+                }
+            }
+        },
+        confirmButton = { Button(onClick = {
+                val formattedTime = String.format("%02d:%02d",selectedHour, selectedMinute)
+                onTimeSelected(formattedTime)
+                onDismiss()  }) { Text("OK") } },
+
+        dismissButton = { Button(onClick = { onDismiss() }) {
+                Text("Cancel")
+            }
+        }
+
+    )
+}
+
 
 @Composable
 fun ShowDifficultyDialog(
@@ -272,6 +329,8 @@ fun ShowDifficultyDialog(
         },
         dismissButton = {}
     )
+
+
 }
 
 
