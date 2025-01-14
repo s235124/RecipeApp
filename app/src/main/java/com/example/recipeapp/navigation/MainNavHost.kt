@@ -1,13 +1,17 @@
 package com.example.recipeapp.navigation
 
 import android.net.Uri
+import CreateMyRecipe
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -32,8 +36,8 @@ fun MainNavHost(
     navController: NavHostController,
     onRouteChanged: (Route) -> Unit,
     modifier: Modifier = Modifier,
-//    favorites: MutableList<Recipe>, TODO: ADD THESE BACK LATER ON
-//    onSaveFavorites: (List<Recipe>) -> Unit,
+    //favorites: MutableList<Recipe>, //TODO: ADD THESE BACK LATER ON
+    //onSaveFavorites: (List<Recipe>) -> Unit,
     recipesFromAPI: RecipeAPI,
     categoriesFromAPI: CategoryAPI,
     recipes: List<Recipe>, // TODO: REMOVE WHEN RECIPES FROM API IS FULLY CHANGED IN ALL THE MODEL CLASSES
@@ -92,10 +96,10 @@ fun MainNavHost(
             )
         }
 
-        composable(Route.FavouritesScreen.title) {
-            onRouteChanged(Route.FavouritesScreen)
-            FavoritesScreen(navController,recipes)
-        }
+            composable(Route.FavouritesScreen.title) {
+                onRouteChanged(Route.FavouritesScreen)
+                FavoritesScreen(navController, recipes)
+            }
 
         composable(Route.MyRecipesScreen.title) {
             onRouteChanged(Route.MyRecipesScreen)

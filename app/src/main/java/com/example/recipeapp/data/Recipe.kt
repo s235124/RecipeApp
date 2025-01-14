@@ -1,11 +1,18 @@
 package com.example.recipeapp.data
 
+import kotlinx.serialization.Serializable
+
+
+@Serializable
 data class Recipe(
     val name: String,
     val time: String,
     val difficulty: String,
+    val description: String,
+    val ingredient: String,
     val calories: String,
-    val imageRes: Int,
+    val imageUri: String? = null,
+    val imageRes: Int? = null,
     val categories: String
 )
 

@@ -42,6 +42,7 @@ import com.example.recipeapp.navigation.MainNavHost
 import com.example.recipeapp.navigation.Route
 import com.example.recipeapp.screens.CategoriesViewModel
 import com.example.recipeapp.screens.RecipeViewModel
+import com.example.recipeapp.navigation.MainNavHost
 import com.example.recipeapp.ui.theme.RecipeAppTheme
 import kotlinx.coroutines.launch
 
@@ -59,9 +60,10 @@ class MainActivity : ComponentActivity() {
                 var recipes by remember { mutableStateOf(emptyList<Recipe>()) }
                 var categories by remember { mutableStateOf(emptyList<Category>()) }
 
+
+                val previousTab = navController.previousBackStackEntry?.destination?.route
                 val currentBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = currentBackStackEntry?.destination?.route
-                val previousTab = navController.previousBackStackEntry?.destination?.route
 
                 recipeAPI = fetchRecipesFromAPI()
                 categoriesAPI = fetchCategoriesFromAPI()
@@ -158,16 +160,16 @@ suspend fun fetchCategories(): List<Category> {
     return listOf(
 
         Category("Italy", R.drawable.flag_italy, recipes =  listOf(
-            Recipe("Spaghetti", "25 min", "Medium", "350 kcal", R.drawable.oip, "Italy"),
-            Recipe("Risotto", "40 min", "Hard", "500 kcal", R.drawable.oip,"Italy")
+            Recipe("Spaghetti", "25 min", "Medium", calories = "350 kcal", imageRes = R.drawable.oip, categories = "Italy", description = "snxbdsxbs" , ingredient = "sxdsxsd"),
+            Recipe("Risotto", "40 min", "Hard", calories = "500 kcal", imageRes =  R.drawable.oip, categories = "Italy", description = "dcdcwcxw" , ingredient = "xjnkwxkwjcn" )
         )),
          Category("Lebanon", R.drawable.flag_lebanon, recipes =  listOf(
-        Recipe("Hummus", "15 min", "Easy", "200 kcal", R.drawable.oip, "Lebanon"),
-        Recipe("Tabbouleh", "30 min", "Medium", "150 kcal", R.drawable.oip, "Lebanon")
+        Recipe("Hummus", "15 min", "Easy", calories = "200 kcal", imageRes = R.drawable.oip, categories = "Lebanon", description = "cwhciubc", ingredient = "hcowbcxwc"),
+        Recipe("Tabbouleh", "30 min", "Medium", calories = "150 kcal", imageRes = R.drawable.oip, categories =  "Lebanon", description = "hcxhwinxi", ingredient = "djkcbwchw")
     )),
         Category("Pakistan", R.drawable.flag_pakistan, recipes = listOf(
-        Recipe("Biryani", "45 min", "Hard", "600 kcal", R.drawable.oip,"Pakistan"),
-        Recipe("Kebab", "30 min", "Medium", "400 kcal", R.drawable.oip,"Pakistan")
+        Recipe("Biryani", "45 min", "Hard", calories = "600 kcal", imageRes = R.drawable.oip, categories = "Pakistan", description = "jxcwjkbcw", ingredient = "dxbewjkb xw "),
+        Recipe("Kebab", "30 min", "Medium", calories = "400 kcal", imageRes = R.drawable.oip, categories = "Pakistan", description = "jdbcjdwbckjdw", ingredient = "kcxdw cdh c")
     ))
     )
 }
