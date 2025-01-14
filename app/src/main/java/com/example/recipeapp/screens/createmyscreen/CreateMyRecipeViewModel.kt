@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import com.example.recipeapp.data.getImageUri
 import kotlinx.coroutines.flow.firstOrNull
 
 
@@ -27,8 +26,6 @@ class CreateMyRecipeViewModel(val context: Context) : ViewModel() {
     val recipes: StateFlow<List<Recipe>> get() = _recipes
 
 
-    private val _imageUriFlow = MutableStateFlow<String?>(null)
-    val imageUriFlow = _imageUriFlow.asStateFlow() // Expose as read-only
 
 
 
@@ -37,8 +34,6 @@ class CreateMyRecipeViewModel(val context: Context) : ViewModel() {
         viewModelScope.launch {
             try {
                 _recipes.value = getMyRecipes(context).first()
-                val savedUri = getImageUri(context).firstOrNull()
-                _imageUriFlow.value = savedUri
             } catch (e: Exception) {
                 // Handle error gracefully (e.g., log error, show fallback UI)
                 _recipes.value = emptyList()
@@ -57,20 +52,16 @@ class CreateMyRecipeViewModel(val context: Context) : ViewModel() {
                 saveMyRecipes(context, updatedRecipes)
                 // Update the in-memory state only after saving
                 _recipes.value = updatedRecipes
-                Log.d("com.example.recipeapp.screens.createmyscreen.CreateMyRecipeViewModel", "Recipe saved: $updatedRecipes")
+                Log.d("com.example.recipeapp.screens.createmyscreen.com.example.recipeapp.screens.createmyscreen.CreateMyRecipeViewModel", "Recipe saved: $updatedRecipes")
             } catch (e: Exception) {
                 // Log or handle errors (optional)
-                Log.e("com.example.recipeapp.screens.createmyscreen.CreateMyRecipeViewModel", "Error saving recipe: ${e.message}")
+                Log.e("com.example.recipeapp.screens.createmyscreen.com.example.recipeapp.screens.createmyscreen.CreateMyRecipeViewModel", "Error saving recipe: ${e.message}")
                 e.printStackTrace()
             }
         }
     }
 
-    fun saveImageUri(uri: String) {
-        viewModelScope.launch {
-            com.example.recipeapp.data.saveImageUriToDataStore(context, uri)// Save to DataStore
-            _imageUriFlow.value = uri // Update StateFlow
-        }
-    }
 
 }
+
+

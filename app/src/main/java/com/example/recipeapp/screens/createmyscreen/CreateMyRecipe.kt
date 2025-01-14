@@ -8,17 +8,16 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -42,11 +41,9 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.recipeapp.data.Recipe
 import com.example.recipeapp.screens.createmyscreen.CreateMyRecipeViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import androidx.compose.runtime.collectAsState
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun CreateMyRecipe(navController: NavController) {
@@ -62,30 +59,22 @@ fun CreateMyRecipe(navController: NavController) {
     var ingredients by remember { mutableStateOf("") }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
-    val savedUri by viewModel.imageUriFlow.collectAsState()
-
-    // Restore saved image URI from ViewModel or DataStore
-    LaunchedEffect(savedUri) {
-        if (savedUri != null) {
-            imageUri = Uri.parse(savedUri)
-        }
-    }
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
             imageUri = uri
-            viewModel.saveImageUri(uri.toString()) // Save image URI to DataStore
         }
     }
 
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        item {
             // Image Selection
             if (imageUri != null) {
                 Image(
@@ -100,41 +89,53 @@ fun CreateMyRecipe(navController: NavController) {
                     Text("Select Image")
                 }
             }
+        }
 
-            // Input Fields
+        item {
             TextField(
                 value = name,
                 onValueChange = { name = it },
                 label = { Text("Recipe Name") },
                 modifier = Modifier.fillMaxWidth()
             )
+        }
+
+        item {
             TextField(
                 value = time,
                 onValueChange = { time = it },
                 label = { Text("Time") },
                 modifier = Modifier.fillMaxWidth()
             )
+        }
+
+        item {
             TextField(
                 value = difficulty,
                 onValueChange = { difficulty = it },
                 label = { Text("Difficulty") },
                 modifier = Modifier.fillMaxWidth()
             )
+        }
+
+        item {
             TextField(
                 value = calories,
                 onValueChange = { calories = it },
                 label = { Text("Calories") },
                 modifier = Modifier.fillMaxWidth()
             )
+        }
 
-            // Description
+        item {
             MultiLineTextField(
                 text = description,
                 placeholder = "Write a description for your recipe...",
                 onTextChange = { description = it }
             )
+        }
 
-            // Save Button
+        item {
             Button(
                 onClick = {
                     viewModel.saveRecipe(
@@ -157,46 +158,48 @@ fun CreateMyRecipe(navController: NavController) {
             }
         }
     }
+}
 
-
-@Composable
-fun MultiLineTextField(
-    text: String,
-    placeholder: String,
-    onTextChange: (String) -> Unit
-) {
-    BasicTextField(
-        value = text,
-        onValueChange = onTextChange,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(150.dp) // Multi-line input height
-            .background(Color(0xFFF0F0F0), RoundedCornerShape(8.dp))
-            .padding(8.dp),
-        textStyle = TextStyle(fontSize = 16.sp, color = Color.Black),
-        decorationBox = { innerTextField ->
-            Box(
-                modifier = Modifier.padding(8.dp),
-                contentAlignment = Alignment.TopStart
-            ) {
-                if (text.isEmpty()) {
-                    Text(text = placeholder, color = Color.Gray)
+    @Composable
+    fun MultiLineTextField(
+        placeholder: String,
+        text: String,
+        onTextChange: (String) -> Unit
+    ) {
+        BasicTextField(
+            value = text,
+            onValueChange = onTextChange,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(150.dp) // Multi-line input height
+                .background(Color(0xFFF0F0F0), RoundedCornerShape(8.dp))
+                .padding(8.dp),
+            textStyle = TextStyle(fontSize = 16.sp, color = Color.Black),
+            decorationBox = { innerTextField ->
+                Box(
+                    modifier = Modifier.padding(8.dp),
+                    contentAlignment = Alignment.TopStart
+                ) {
+                    if (text.isEmpty()) {
+                        Text(text = placeholder, color = Color.Gray)
+                    }
+                    innerTextField()
                 }
-                innerTextField()
             }
-        }
-    )
-}
-
-class CreateMyRecipeViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(CreateMyRecipeViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return CreateMyRecipeViewModel(context) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
+        )
     }
-}
+
+
+    class CreateMyRecipeViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(CreateMyRecipeViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return CreateMyRecipeViewModel(context) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
+        }
+    }
+
 
 
 

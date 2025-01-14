@@ -16,8 +16,6 @@ import kotlinx.serialization.json.Json
 val Context.MyRecipeDataStore: DataStore<Preferences> by preferencesDataStore(name = "MyRecipe")
 val SAVED_RECIPES_KEY = stringPreferencesKey("MyRecipe_")
 
-val Context.dataStore by preferencesDataStore(name = "recipe_data_store")
-val IMAGE_URI_KEY = stringPreferencesKey("image_uri")
 
 val Context.MyfavoriteRecipeDataStore: DataStore<Preferences> by preferencesDataStore(name = "favorites")
 val FAVORITES_KEY = stringPreferencesKey("favorite_personas")
@@ -70,19 +68,6 @@ fun getMyRecipes(context: Context): Flow<List<Recipe>> {
             }
     }
 
-// Save Image URI
-suspend fun saveImageUriToDataStore(context: Context, uri: String) {
-    context.dataStore.edit { preferences ->
-        preferences[IMAGE_URI_KEY] = uri
-    }
-}
-
-// Retrieve Image URI
-fun getImageUri(context: Context): Flow<String?> {
-    return context.dataStore.data.map { preferences ->
-        preferences[IMAGE_URI_KEY]
-    }
-}
 
 
 
