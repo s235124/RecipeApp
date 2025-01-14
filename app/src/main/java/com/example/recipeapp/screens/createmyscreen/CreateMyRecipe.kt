@@ -1,11 +1,12 @@
-
 import android.annotation.SuppressLint
+import android.app.TimePickerDialog
 import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,11 +43,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.recipeapp.data.Recipe
 import com.example.recipeapp.screens.createmyscreen.CreateMyRecipeViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.res.painterResource
-import com.example.recipeapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -57,7 +54,7 @@ fun CreateMyRecipe(onSaveClick: () -> Unit) {
         viewModel(factory = CreateMyRecipeViewModelFactory(context))
 
     var name by remember { mutableStateOf("") }
-    var time by remember { mutableStateOf("") }
+    var time by remember { mutableStateOf("Select Time") }
     var difficulty by remember { mutableStateOf("") }
     var calories by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
@@ -65,6 +62,8 @@ fun CreateMyRecipe(onSaveClick: () -> Unit) {
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
     val savedUri by viewModel.imageUriFlow.collectAsState()
+
+    var showTimePicker by remember { mutableStateOf(false) }
 
     // Restore saved image URI from ViewModel or DataStore
     LaunchedEffect(savedUri) {
@@ -80,6 +79,18 @@ fun CreateMyRecipe(onSaveClick: () -> Unit) {
         }
     }
 
+    //Tidvælger-dialog
+    if (showTimePicker) {
+        TimePickerDialog(
+            context,
+            { _, hourOfDay, minute ->
+                val formattedTime = String.format("%02d:%02d", hourOfDay, minute)
+                time = formattedTime
+                showTimePicker = false // Luk dialogen
+            },
+            0, 0, true //24 hour format
+        ).show()
+    }
 
         Column(
             modifier = Modifier
@@ -104,30 +115,32 @@ fun CreateMyRecipe(onSaveClick: () -> Unit) {
             }
 
             // Input Fields
-            TextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("Recipe Name") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            TextField(
-                value = time,
-                onValueChange = { time = it },
-                label = { Text("Time") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            TextField(
-                value = difficulty,
-                onValueChange = { difficulty = it },
-                label = { Text("Difficulty") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            TextField(
-                value = calories,
-                onValueChange = { calories = it },
-                label = { Text("Calories") },
-                modifier = Modifier.fillMaxWidth()
-            )
+        TextField(
+            value = name,
+            onValueChange = { name = it },
+            label = { Text("Recipe Name") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        //Tidvælger-knap
+        Button(
+            onClick = { showTimePicker = true },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(time) //Viser valgt tid or standardtekst
+        }
+        TextField(
+            value = difficulty,
+            onValueChange = { difficulty = it },
+            label = { Text("Difficulty") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        TextField(
+            value = calories,
+            onValueChange = { calories = it },
+            label = { Text("Calories") },
+            modifier = Modifier.fillMaxWidth()
+        )
 
             // Description
             MultiLineTextField(
