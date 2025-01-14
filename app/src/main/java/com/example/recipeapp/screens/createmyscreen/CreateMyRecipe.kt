@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -55,15 +56,16 @@ fun CreateMyRecipe(onSaveClick: () -> Unit) {
 
     var name by remember { mutableStateOf("") }
     var time by remember { mutableStateOf("Select Time") }
-    var difficulty by remember { mutableStateOf("") }
+    var difficulty by remember { mutableStateOf("Select Difficulty") }
     var calories by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var ingredients by remember { mutableStateOf("") }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
+    var showDifficultyDialog by remember { mutableStateOf(false) }
+    var showTimePicker by remember { mutableStateOf(false) }
+
 
     val savedUri by viewModel.imageUriFlow.collectAsState()
-
-    var showTimePicker by remember { mutableStateOf(false) }
 
     // Restore saved image URI from ViewModel or DataStore
     LaunchedEffect(savedUri) {
@@ -78,6 +80,8 @@ fun CreateMyRecipe(onSaveClick: () -> Unit) {
             viewModel.saveImageUri(uri.toString()) // Save image URI to DataStore
         }
     }
+
+    //Logik for knappene på skærmen  (tids- og sværhedsvælger)
 
     //Tidvælger-dialog
     if (showTimePicker) {
@@ -98,7 +102,18 @@ fun CreateMyRecipe(onSaveClick: () -> Unit) {
         }
     }
 
-        Column(
+    if (showDifficultyDialog) {
+        ShowDifficultyDialog(
+            onDismiss = { showDifficultyDialog = false },
+            onDifficultySelected = { selectedDifficulty ->
+                difficulty = selectedDifficulty
+            }
+        )
+    }
+
+
+
+    Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
@@ -135,12 +150,16 @@ fun CreateMyRecipe(onSaveClick: () -> Unit) {
         ) {
             Text(time) //Viser valgt tid or standardtekst
         }
-        TextField(
-            value = difficulty,
-            onValueChange = { difficulty = it },
-            label = { Text("Difficulty") },
+
+
+        //Sværhedsgrad knap
+        Button(
+            onClick = { showDifficultyDialog = true },
             modifier = Modifier.fillMaxWidth()
-        )
+        ){
+            Text(difficulty)
+        }
+
         TextField(
             value = calories,
             onValueChange = { calories = it },
@@ -220,6 +239,40 @@ class CreateMyRecipeViewModelFactory(private val context: Context) : ViewModelPr
 }
 
 
+@Composable
+fun ShowDifficultyDialog(
+    onDismiss:() -> Unit,
+    onDifficultySelected:(String) -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = { onDismiss()},
+        title = { Text("Select Difficulty") },
+        text = { Text("Please choose a difficulty level for your recipe.") },
+        confirmButton = {
+            Column {
+                Button(onClick = {
+                    onDifficultySelected("Easy")
+                    onDismiss()
+                }) {
+                    Text("Easy")
+                }
+                Button(onClick = {
+                    onDifficultySelected("Medium")
+                    onDismiss()
+                }) {
+                    Text("Medium")
+                }
+                Button(onClick = {
+                    onDifficultySelected("Hard")
+                    onDismiss()
+                }) {
+                    Text("Hard")
+                }
+            }
+        },
+        dismissButton = {}
+    )
+}
 
 
 
