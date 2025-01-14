@@ -81,15 +81,21 @@ fun CreateMyRecipe(onSaveClick: () -> Unit) {
 
     //Tidvælger-dialog
     if (showTimePicker) {
-        TimePickerDialog(
-            context,
-            { _, hourOfDay, minute ->
-                val formattedTime = String.format("%02d:%02d", hourOfDay, minute)
-                time = formattedTime
-                showTimePicker = false // Luk dialogen
-            },
-            0, 0, true //24 hour format
-        ).show()
+        LaunchedEffect(Unit) {
+            TimePickerDialog(
+                context,
+                { _, hourOfDay, minute ->
+                    val formattedTime = String.format("%02d:%02d", hourOfDay, minute)
+                    time = formattedTime
+                    showTimePicker = false // Luk dialogen
+                },
+                0, 0, true //24 hour format
+            ).apply {
+                setOnCancelListener {
+                    showTimePicker = false
+                }
+            }.show()
+        }
     }
 
         Column(
