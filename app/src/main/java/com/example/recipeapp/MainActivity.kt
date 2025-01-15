@@ -38,11 +38,10 @@ import com.example.recipeapp.data.Category
 import com.example.recipeapp.data.CategoryAPI
 import com.example.recipeapp.data.Recipe
 import com.example.recipeapp.data.RecipeAPI
-import com.example.recipeapp.http.APITestingViewModel
 import com.example.recipeapp.navigation.MainNavHost
 import com.example.recipeapp.navigation.Route
+import com.example.recipeapp.screens.CategoriesViewModel
 import com.example.recipeapp.screens.RecipeViewModel
-import com.example.recipeapp.navigation.MainNavHost
 import com.example.recipeapp.ui.theme.RecipeAppTheme
 import kotlinx.coroutines.launch
 
@@ -56,6 +55,7 @@ class MainActivity : ComponentActivity() {
                 val coroutineScope = rememberCoroutineScope()
 
                 var recipeAPI by remember { mutableStateOf(RecipeAPI()) }
+                var categoriesAPI by remember { mutableStateOf(CategoryAPI()) }
                 var recipes by remember { mutableStateOf(emptyList<Recipe>()) }
                 var categories by remember { mutableStateOf(emptyList<Category>()) }
 
@@ -65,6 +65,7 @@ class MainActivity : ComponentActivity() {
                 val currentRoute = currentBackStackEntry?.destination?.route
 
                 recipeAPI = fetchRecipesFromAPI()
+                categoriesAPI = fetchCategoriesFromAPI()
 
                 // Fetch recipes on startup
                 LaunchedEffect(Unit) {
@@ -75,7 +76,6 @@ class MainActivity : ComponentActivity() {
                 }
 
                 Scaffold (
-                    // TODO: FIGURE OUT WHAT TO DO WITH TOP BAR
                     bottomBar = {
                         BottomBar(
                             onHomeClick = {
@@ -105,6 +105,7 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
 //                    val tags = fetchData()
                     MainNavHost(
+                        paddingValues = innerPadding,
                         navController = navController,
                         onRouteChanged = { route ->
 //                            Log.d("RecipeApp", "Navigated to route: ${route.title}")
@@ -113,6 +114,7 @@ class MainActivity : ComponentActivity() {
                             .fillMaxSize()
                             .padding(innerPadding),
                         recipesFromAPI = recipeAPI,
+                        categoriesFromAPI = categoriesAPI,
                         recipes = recipes,
                         categories = categories
                     )
@@ -127,13 +129,22 @@ fun fetchRecipesFromAPI(): RecipeAPI {
     val viewModel: RecipeViewModel = viewModel() // Proper ViewModel instantiation
     val recipes by viewModel.data.collectAsState(initial = null) // Collect StateFlow
 
-//    println(recipeTags)
+    println(recipes)
 
     return if (recipes == null) RecipeAPI()
     else recipes as RecipeAPI
 }
 
+@Composable
+fun fetchCategoriesFromAPI(): CategoryAPI {
+    val viewModel: CategoriesViewModel = viewModel() // Proper ViewModel instantiation
+    val categories by viewModel.data.collectAsState(initial = null) // Collect StateFlow
 
+    println(categories)
+
+    return if (categories == null) CategoryAPI()
+    else categories as CategoryAPI
+}
 
 // Simulated functions to fetch recipes and categories
 suspend fun fetchRecipes(): List<Recipe> {
@@ -186,10 +197,11 @@ fun BottomBar(
     val myRecipes = Route.MyRecipesScreen.title
     val favorites = Route.FavouritesScreen.title
     val search = Route.SearchScreen.title
+    val recipeDetailsFromAPI = Route.RecipeDetailFromAPIScreen.title
     val recipeDetails = Route.RecipeDetailScreen.title
 
-    val recipeDetailScreenFromHome = currentTab?.contains(recipeDetails) == true && previousTab == main
-    val recipeDetailScreenFromFavorites = currentTab?.contains(recipeDetails) == true && previousTab == favorites
+    val recipeDetailScreenFromHome = currentTab?.contains(recipeDetailsFromAPI) == true && previousTab == main
+    val recipeDetailScreenFromFavorites = currentTab?.contains(recipeDetailsFromAPI) == true && previousTab == favorites
     val recipeDetailScreenFromMyRecipes = currentTab?.contains(recipeDetails) == true && previousTab == myRecipes
 
     NavigationBar(

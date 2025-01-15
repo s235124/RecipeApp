@@ -30,7 +30,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.recipeapp.BottomBar
 import com.example.recipeapp.model.RecipeCard
 import com.example.recipeapp.model.CustomSearchBar
 import com.example.recipeapp.data.Recipe
@@ -38,7 +37,10 @@ import com.example.recipeapp.data.Recipe
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FavoritesScreen(navController: NavController, recipes: List<Recipe>) {
+fun FavoritesScreen(
+    onNavigateToRecipeDetailScreen: () -> Unit,
+    recipes: List<Recipe>
+) {
     var searchQuery by remember { mutableStateOf("") }
     val filteredRecipes = recipes.filter { it.name.contains(searchQuery, ignoreCase = true) }
 
@@ -73,15 +75,6 @@ fun FavoritesScreen(navController: NavController, recipes: List<Recipe>) {
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
         ) {
-            // Search bar for filtering recipes
-            CustomSearchBar(
-                searchQuery = searchQuery,
-                onSearchQueryChange = { query -> searchQuery = query },
-                navController = navController,
-                showNavigation = false,
-                paddingValues
-            )
-
             // Updated LazyColumn with improved padding
             LazyColumn(
                 contentPadding = PaddingValues(vertical = 8.dp),
@@ -90,10 +83,7 @@ fun FavoritesScreen(navController: NavController, recipes: List<Recipe>) {
                 items(filteredRecipes) { recipe ->
                     RecipeCard(
                         recipe = recipe,
-                        navController = navController,
-                        modifier = Modifier
-                            .padding(horizontal = 8.dp)
-                            .fillMaxWidth()
+                        onNavigateToRecipeDetailScreen = onNavigateToRecipeDetailScreen
                     )
                 }
             }

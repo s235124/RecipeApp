@@ -1,4 +1,4 @@
-package com.example.recipeapp.screens
+package com.example.recipeapp.screens.recipe
 
 import android.content.Context
 import android.util.Log
@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,16 +27,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
+import com.example.recipeapp.data.Recipe
 import com.example.recipeapp.model.RecipeCard
-import com.example.recipeapp.navigation.Route
-import com.example.recipeapp.screens.recipe.MyRecipeViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyRecipesScreen(
-    navController: NavController,
+    onNewMyRecipeClick: () -> Unit,
+    onNavigateToRecipeDetailScreen: (Recipe) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -56,18 +54,9 @@ fun MyRecipesScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.Black
-                        )
-                    }
-                },
                 title = { Text("My Recipes") },
                 actions = {
-                    IconButton(onClick = { navController.navigate(Route.CreateMyRecipe.title) }) {
+                    IconButton(onClick = { onNewMyRecipeClick() }) {
                         Icon(
                             imageVector = Icons.Filled.AddCircle,
                             contentDescription = "Add Recipe",
@@ -99,18 +88,14 @@ fun MyRecipesScreen(
                 items(savedRecipes) { recipe ->
                     RecipeCard(
                         recipe = recipe,
-                        navController = navController,
+                        onNavigateToRecipeDetailScreen = { onNavigateToRecipeDetailScreen(recipe) },
                         modifier = Modifier.padding(8.dp)
                     )
                 }
             }
-
         }
     }
 }
-
-
-
 
 class MyRecipeViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

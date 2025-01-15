@@ -31,15 +31,21 @@ fun RecipeCardFromAPI(
     onCardClick: () -> Unit,
     modifier: Modifier = Modifier // Optional default modifier
 ) {
-    val cardBackgroundColor = Color(0xFF78B17E)
-    Card(
-        modifier = Modifier
+    val cardModifier: Modifier = if (modifier == Modifier) {
+        Modifier
             .padding(8.dp)
             .fillMaxWidth()
             .height(300.dp)
             .clickable {
                 onCardClick()
-            },
+            }
+    }
+    else {
+        modifier.clickable { onCardClick() }
+    }
+    val cardBackgroundColor = Color(0xFF78B17E)
+    Card(
+        modifier = cardModifier,
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = cardBackgroundColor)
@@ -81,6 +87,7 @@ fun RecipeCardFromAPI(
                     if (recipe.preparationTime != null && recipe.cookingTime != null) append("${recipe.preparationTime} + ${recipe.cookingTime}")
                     else if (recipe.preparationTime != null) append("${recipe.preparationTime}")
                     else if (recipe.cookingTime != null) append("${recipe.cookingTime}")
+                    else {append("N/A"); return@buildString}
                     append(" minutes")
                 }
 

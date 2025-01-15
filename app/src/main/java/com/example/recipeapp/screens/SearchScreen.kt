@@ -28,7 +28,10 @@ import com.example.recipeapp.model.RecipeCardFromAPI
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchScreen(onCardClick: (RecipeItem) -> Unit, recipes: RecipeAPI) {
+fun SearchScreen(
+    onCardClick: (RecipeItem) -> Unit,
+    recipes: RecipeAPI
+) {
     var searchQuery by remember { mutableStateOf("") }
     val filteredRecipes = recipes.items.filter { it.description.contains(searchQuery, ignoreCase = true) }
 
@@ -71,9 +74,9 @@ fun SearchScreen(onCardClick: (RecipeItem) -> Unit, recipes: RecipeAPI) {
                     RecipeCardFromAPI(
                         recipe = recipe,
                         onCardClick = { onCardClick(recipe) },
-                        modifier = Modifier
-                            .padding(horizontal = 8.dp)
-                            .fillMaxWidth()
+//                        modifier = Modifier
+//                            .padding(horizontal = 8.dp)
+//                            .fillMaxWidth()
                     )
                 }
             }

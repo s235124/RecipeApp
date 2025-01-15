@@ -42,11 +42,13 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.recipeapp.data.Recipe
 import com.example.recipeapp.screens.createmyscreen.CreateMyRecipeViewModel
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.res.painterResource
+import com.example.recipeapp.R
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun CreateMyRecipe(navController: NavController) {
+fun CreateMyRecipe(onSaveClick: () -> Unit) {
     val context = LocalContext.current
     val viewModel: CreateMyRecipeViewModel =
         viewModel(factory = CreateMyRecipeViewModelFactory(context))
@@ -150,7 +152,7 @@ fun CreateMyRecipe(navController: NavController) {
                             ingredient = ingredients
                         )
                     )
-                    navController.popBackStack()
+                    onSaveClick()
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
