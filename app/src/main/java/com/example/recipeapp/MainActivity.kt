@@ -159,16 +159,16 @@ suspend fun fetchCategories(): List<Category> {
     return listOf(
 
         Category("Italy", R.drawable.flag_italy, recipes =  listOf(
-            Recipe("Spaghetti", "25 min", "Medium", calories = "350 kcal", imageRes = R.drawable.oip, categories = "Italy", description = "snxbdsxbs" , ingredient = "sxdsxsd"),
-            Recipe("Risotto", "40 min", "Hard", calories = "500 kcal", imageRes =  R.drawable.oip, categories = "Italy", description = "dcdcwcxw" , ingredient = "xjnkwxkwjcn" )
+            Recipe("Spaghetti", "25 min", "Medium", calories = "350 kcal", imageRes = R.drawable.oip, categories = "Italy", description = "snxbdsxbs" , ingredient = listOf("sxdsxsd", "ksjdhf", "kjsdhfas"), method = listOf("Skibbidi", "Yeet")),
+            Recipe("Risotto", "40 min", "Hard", calories = "500 kcal", imageRes =  R.drawable.oip, categories = "Italy", description = "dcdcwcxw" , ingredient = listOf("sxdsxsd", "ksjdhf", "kjsdhfas"), method = listOf("Skibbidi", "Yeet") )
         )),
          Category("Lebanon", R.drawable.flag_lebanon, recipes =  listOf(
-        Recipe("Hummus", "15 min", "Easy", calories = "200 kcal", imageRes = R.drawable.oip, categories = "Lebanon", description = "cwhciubc", ingredient = "hcowbcxwc"),
-        Recipe("Tabbouleh", "30 min", "Medium", calories = "150 kcal", imageRes = R.drawable.oip, categories =  "Lebanon", description = "hcxhwinxi", ingredient = "djkcbwchw")
+        Recipe("Hummus", "15 min", "Easy", calories = "200 kcal", imageRes = R.drawable.oip, categories = "Lebanon", description = "cwhciubc", ingredient = listOf("sxdsxsd", "ksjdhf", "kjsdhfas"), method = listOf("Skibbidi", "Yeet")),
+        Recipe("Tabbouleh", "30 min", "Medium", calories = "150 kcal", imageRes = R.drawable.oip, categories =  "Lebanon", description = "hcxhwinxi", ingredient = listOf("sxdsxsd", "ksjdhf", "kjsdhfas"), method = listOf("Skibbidi", "Yeet"))
     )),
         Category("Pakistan", R.drawable.flag_pakistan, recipes = listOf(
-        Recipe("Biryani", "45 min", "Hard", calories = "600 kcal", imageRes = R.drawable.oip, categories = "Pakistan", description = "jxcwjkbcw", ingredient = "dxbewjkb xw "),
-        Recipe("Kebab", "30 min", "Medium", calories = "400 kcal", imageRes = R.drawable.oip, categories = "Pakistan", description = "jdbcjdwbckjdw", ingredient = "kcxdw cdh c")
+        Recipe("Biryani", "45 min", "Hard", calories = "600 kcal", imageRes = R.drawable.oip, categories = "Pakistan", description = "jxcwjkbcw", ingredient = listOf("sxdsxsd", "ksjdhf", "kjsdhfas"), method = listOf("Skibbidi", "Yeet")),
+        Recipe("Kebab", "30 min", "Medium", calories = "400 kcal", imageRes = R.drawable.oip, categories = "Pakistan", description = "jdbcjdwbckjdw", ingredient = listOf("sxdsxsd", "ksjdhf", "kjsdhfas"), method = listOf("Skibbidi", "Yeet"))
     ))
     )
 }
@@ -199,6 +199,7 @@ fun BottomBar(
     val search = Route.SearchScreen.title
     val recipeDetailsFromAPI = Route.RecipeDetailFromAPIScreen.title
     val recipeDetails = Route.RecipeDetailScreen.title
+    val create = Route.CreateMyRecipeScreen.title
 
     val recipeDetailScreenFromHome = currentTab?.contains(recipeDetailsFromAPI) == true && previousTab == main
     val recipeDetailScreenFromFavorites = currentTab?.contains(recipeDetailsFromAPI) == true && previousTab == favorites
@@ -232,7 +233,7 @@ fun BottomBar(
 
         NavigationBarItem(
             icon = {
-                val icon = if (currentTab == myRecipes || recipeDetailScreenFromMyRecipes) R.drawable.bookmark_filled else R.drawable.bookmark_outlined
+                val icon = if (currentTab == myRecipes || currentTab == create || recipeDetailScreenFromMyRecipes) R.drawable.bookmark_filled else R.drawable.bookmark_outlined
                 Icon(painterResource(icon), contentDescription = "My Recipes", tint = bottomcolor, modifier = Modifier.size(32.dp))
             },
             label = { Text("My recipes") },

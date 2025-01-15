@@ -1,9 +1,7 @@
 package com.example.recipeapp.screens
 
 import android.annotation.SuppressLint
-import android.media.Image
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -11,9 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -21,19 +17,16 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
 import com.example.recipeapp.R
 import com.example.recipeapp.data.Recipe
@@ -52,20 +45,20 @@ fun RecipeDetailScreen(
             .padding(innerPadding),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        LazyColumn {
-            item {
-                CenterAlignedTopAppBar(
-                    title = { Text("Recipe Details") },
-                    navigationIcon = {
-                        IconButton(onClick = onBackButtonClick) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = null
-                            )
-                        }
-                    }
-                )
+        CenterAlignedTopAppBar(
+            title = { Text("Recipe Details") },
+            navigationIcon = {
+                IconButton(onClick = onBackButtonClick) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = null
+                    )
+                }
             }
+        )
+        LazyColumn (
+            modifier = Modifier.padding(top = 16.dp)
+        ) {
             item {
                 val img: Painter = if (recipe.imageUri == null) {
                     painterResource(R.drawable.oip)
@@ -77,9 +70,10 @@ fun RecipeDetailScreen(
                     painter = img,
                     contentDescription = null,
                     modifier = Modifier
-                        .fillMaxWidth(),
-//                        .size(100.dp),
-                    alignment = Alignment.Center
+                        .fillMaxWidth()
+                        .height(200.dp),
+                    alignment = Alignment.Center,
+                    contentScale = ContentScale.Crop
                 )
 
             }
@@ -90,6 +84,15 @@ fun RecipeDetailScreen(
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                     textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            item {
+                Text(
+                    text = recipe.name,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(horizontal = 16.dp)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }
@@ -126,6 +129,34 @@ fun RecipeDetailScreen(
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            item {
+                Text(
+                    text = "Method",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+
+                var i = 1
+                for (step in recipe.method) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Step $i",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+
+                    Text(
+                        text = step.replace("�", "% "),
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                    i++
                 }
                 Spacer(modifier = Modifier.height(16.dp))
             }

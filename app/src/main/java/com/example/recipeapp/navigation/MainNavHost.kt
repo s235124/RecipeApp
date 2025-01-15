@@ -1,11 +1,12 @@
 package com.example.recipeapp.navigation
 
-import CreateMyRecipe
 import android.net.Uri
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -22,9 +23,10 @@ import com.example.recipeapp.screens.CategoryRecipesScreen
 import com.example.recipeapp.screens.FavoritesScreen
 import com.example.recipeapp.screens.MainScreen
 import com.example.recipeapp.screens.RecipeDetailScreen
-import com.example.recipeapp.screens.recipe.MyRecipesScreen
 import com.example.recipeapp.screens.RecipeDetailsFromAPIScreen
 import com.example.recipeapp.screens.SearchScreen
+import com.example.recipeapp.screens.createmyscreen.CreateMyRecipe
+import com.example.recipeapp.screens.recipe.MyRecipesScreen
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -68,6 +70,7 @@ fun MainNavHost(
             onRouteChanged(Route.SearchScreen)
 
             SearchScreen(
+                paddingValues = paddingValues,
                 onCardClick = { recipe ->
                     navigateToAPIRecipeDetails(navController, recipe)
                 },
@@ -166,9 +169,21 @@ fun MainNavHost(
             )
         }
 
-        composable(Route.CreateMyRecipeScreen.title) {
+        composable(
+            Route.CreateMyRecipeScreen.title,
+            enterTransition = {
+                slideInVertically(initialOffsetY = { 1000 })
+            },
+            popExitTransition = {
+                slideOutVertically(targetOffsetY = { 1000 })
+            }
+        ) {
             onRouteChanged(Route.CreateMyRecipeScreen)
-            CreateMyRecipe(onSaveClick = { navController.popBackStack() })
+            CreateMyRecipe(
+                paddingValues = paddingValues,
+                onSaveClick = { navController.popBackStack() },
+                onCancelClick = { navController.popBackStack() }
+            )
         }
     }
 }
