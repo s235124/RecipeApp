@@ -36,6 +36,99 @@ fun Grids(recipes: List<Recipe>, modifier: Modifier = Modifier, navController: N
 //                fontWeight = FontWeight.Bold
 //            )
 //        }
+
+//        LazyVerticalGrid(
+//            columns = GridCells.Fixed(2),
+//            Modifier
+//                .fillMaxSize()
+//                .padding(8.dp)
+//
+//        ) {
+//            items(recipes) { recipe ->
+//                RecipeCard(
+//                    recipe = recipe,
+//                    onNavigate = TODO(),
+//                    modifier = TODO()
+//                )
+//            }
+//        }
+//    }
+    Column {
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .height(40.dp)
+                .padding(horizontal = 10.dp)
+        ) {
+            Text(
+                text = "Suggestions",
+                style = MaterialTheme.typography.headlineMedium,
+                color = Color.Black,
+                fontWeight = FontWeight.Bold
+            )
+        }
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            Modifier
+                .fillMaxSize()
+                .padding(8.dp)
+
+        ) {
+            items(recipes) { recipe ->
+                RecipeCard(
+                    recipe = recipe,
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .fillMaxWidth(),
+                    onNavigateToRecipeDetailScreen = TODO()
+                )
+            }
+        }
+    }
+//    Column {
+//        Box(
+//            Modifier
+//                .fillMaxWidth()
+//                .height(40.dp)
+//                .padding(horizontal = 10.dp)
+//        ) {
+//            Text(
+//                text = "Suggestions",
+//                style = MaterialTheme.typography.headlineMedium,
+//                color = Color.Black,
+//                fontWeight = FontWeight.Bold
+//            )
+//        }
+//        LazyVerticalGrid(
+//            columns = GridCells.Fixed(2),
+//            Modifier
+//                .fillMaxSize()
+//                .padding(8.dp)
+//
+//        ) {
+//            items(recipes) { recipe ->
+//                RecipeCard(
+//                    recipe = recipe,
+//                    onNavigate = TODO(),
+//                    modifier = TODO()
+//                )
+//            }
+//        }
+//    }
+//    Column {
+//        Box(
+//            Modifier
+//                .fillMaxWidth()
+//                .height(40.dp)
+//                .padding(horizontal = 10.dp)
+//        ) {
+//            Text(
+//                text = "Suggestions",
+//                style = MaterialTheme.typography.headlineMedium,
+//                color = Color.Black,
+//                fontWeight = FontWeight.Bold
+//            )
+//        }
 //        LazyVerticalGrid(
 //            columns = GridCells.Fixed(2),
 //            Modifier

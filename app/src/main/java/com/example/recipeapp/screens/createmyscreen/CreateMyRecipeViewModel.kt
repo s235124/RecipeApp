@@ -15,17 +15,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 
 
-
-
 class CreateMyRecipeViewModel(val context: Context) : ViewModel() {
-
-
 
     // StateFlow to observe the list of recipes
     private val _recipes = MutableStateFlow<List<Recipe>>(emptyList())
     val recipes: StateFlow<List<Recipe>> get() = _recipes
-
-
 
 
 
