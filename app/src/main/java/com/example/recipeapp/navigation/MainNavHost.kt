@@ -122,21 +122,31 @@ fun MainNavHost(
         composable(
             "${Route.RecipeDetailScreen.title}/{recipeJson}",
             enterTransition = {
-                slideInHorizontally(initialOffsetX = { 1000 }) // Slide in from the right
+                slideInHorizontally(initialOffsetX = { fullWidth -> fullWidth }) // Slide in from the right
             },
             popExitTransition = {
-                slideOutHorizontally(targetOffsetX = { 1000 }) // Slide out to the left
+                slideOutHorizontally(targetOffsetX = { fullWidth -> fullWidth }) // Slide out to the left
             }
         ) { backStackEntry ->
             onRouteChanged(Route.RecipeDetailScreen)
             val recipeJson = backStackEntry.arguments?.getString("recipeJson") ?: ""
             val format = Json { ignoreUnknownKeys = true }
             val recipe = recipeJson.let {format.decodeFromString<Recipe>(Uri.decode(it))}
-            RecipeDetailScreen(
-                innerPadding = paddingValues,
-                onBackButtonClick = { navController.popBackStack() },
-                recipe = recipe
-            )
+
+            // Immediate background and content wrapper
+            Box(modifier = Modifier.fillMaxSize()) {
+                // Static background displayed immediately
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.White) // Replace with your desired background color or image
+                )
+                RecipeDetailScreen(
+                    innerPadding = paddingValues,
+                    onBackButtonClick = { navController.popBackStack() },
+                    recipe = recipe
+                )
+            }
         }
 
         composable(Route.FavouritesScreen.title) {
@@ -194,18 +204,27 @@ fun MainNavHost(
         composable(
             Route.CreateMyRecipeScreen.title,
             enterTransition = {
-                slideInVertically(initialOffsetY = { 1000 })
+                slideInVertically(initialOffsetY = { fullHeight -> fullHeight })
             },
             popExitTransition = {
-                slideOutVertically(targetOffsetY = { 1000 })
+                slideOutVertically(targetOffsetY = { fullHeight -> fullHeight })
             }
         ) {
             onRouteChanged(Route.CreateMyRecipeScreen)
-            CreateMyRecipe(
-                paddingValues = paddingValues,
-                onSaveClick = { navController.popBackStack() },
-                onCancelClick = { navController.popBackStack() }
-            )
+            // Immediate background and content wrapper
+            Box(modifier = Modifier.fillMaxSize()) {
+                // Static background displayed immediately
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.White) // Replace with your desired background color or image
+                )
+                CreateMyRecipe(
+                    paddingValues = paddingValues,
+                    onSaveClick = { navController.popBackStack() },
+                    onCancelClick = { navController.popBackStack() }
+                )
+            }
         }
     }
 }
