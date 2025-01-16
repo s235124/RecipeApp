@@ -34,7 +34,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -94,11 +93,11 @@ fun CreateMyRecipe(
     val savedUri by viewModel.imageUriFlow.collectAsState()
 
     // Restore saved image URI from ViewModel or DataStore
-    LaunchedEffect(savedUri) {
-        if (savedUri != null) {
-            imageUri = Uri.parse(savedUri)
-        }
-    }
+//    LaunchedEffect(savedUri) {
+//        if (savedUri != null) {
+//            imageUri = Uri.parse(savedUri)
+//        }
+//    }
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {

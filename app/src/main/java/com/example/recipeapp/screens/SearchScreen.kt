@@ -92,7 +92,7 @@ fun SearchScreen(
             columns = GridCells.Fixed(2),
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp)
+                .padding(start = 8.dp, end = 8.dp)
         ) {
             items(filteredRecipes) { recipe ->
                 RecipeCardFromAPI(

@@ -3,13 +3,19 @@ package com.example.recipeapp.navigation
 import android.net.Uri
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -80,22 +86,38 @@ fun MainNavHost(
         composable(
             "${Route.RecipeDetailFromAPIScreen.title}/{recipeJson}",
             enterTransition = {
-                slideInHorizontally(initialOffsetX = { 1000 }) // Slide in from the right
+                slideInHorizontally(initialOffsetX = { fullWidth -> fullWidth }) // Slide in from the right
             },
             popExitTransition = {
-                slideOutHorizontally(targetOffsetX = { 1000 }) // Slide out to the left
+                slideOutHorizontally(targetOffsetX = { fullWidth -> fullWidth }) // Slide out to the left
             }
         ) { backStackEntry ->
+            // Notify about route change
             onRouteChanged(Route.RecipeDetailFromAPIScreen)
+
+            // Decode the recipe JSON
             val recipeJson = backStackEntry.arguments?.getString("recipeJson") ?: ""
             val format = Json { ignoreUnknownKeys = true }
-            val recipe = recipeJson.let {format.decodeFromString<RecipeItem>(Uri.decode(it))}
-            RecipeDetailsFromAPIScreen(
-                innerPadding = paddingValues,
-                onBackButtonClick = { navController.popBackStack() },
-                recipe = recipe
-            )
+            val recipe = recipeJson.let { format.decodeFromString<RecipeItem>(Uri.decode(it)) }
+
+            // Immediate background and content wrapper
+            Box(modifier = Modifier.fillMaxSize()) {
+                // Static background displayed immediately
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.White) // Replace with your desired background color or image
+                )
+
+                // Main content that slides in
+                RecipeDetailsFromAPIScreen(
+                    innerPadding = paddingValues,
+                    onBackButtonClick = { navController.popBackStack() },
+                    recipe = recipe
+                )
+            }
         }
+
 
         composable(
             "${Route.RecipeDetailScreen.title}/{recipeJson}",
@@ -143,10 +165,10 @@ fun MainNavHost(
         composable(
             Route.AllCategoriesScreen.title,
             enterTransition = {
-                slideInHorizontally(initialOffsetX = { 1000 })// + fadeIn() // Slide in from the right
+                slideInHorizontally(initialOffsetX = { 1000 }) + fadeIn(initialAlpha = 1f) // Slide in from the right
             },
             exitTransition = {
-                slideOutHorizontally(targetOffsetX = { 1000 })// + fadeOut() // Slide out to the left
+                slideOutHorizontally(targetOffsetX = { 1000 }) + fadeOut(targetAlpha = 1f) // Slide out to the left
             }
         ) {
             onRouteChanged(Route.AllCategoriesScreen)

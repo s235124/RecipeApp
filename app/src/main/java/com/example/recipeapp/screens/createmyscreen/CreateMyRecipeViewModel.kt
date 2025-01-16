@@ -5,17 +5,16 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.recipeapp.data.Recipe
-import com.example.recipeapp.data.getMyRecipes
-import com.example.recipeapp.data.saveMyRecipes
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import com.example.recipeapp.data.getImageUri
+import com.example.recipeapp.data.getMyRecipes
+import com.example.recipeapp.data.saveImageUriToDataStore
+import com.example.recipeapp.data.saveMyRecipes
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
-
-
+import kotlinx.coroutines.launch
 
 
 class CreateMyRecipeViewModel(val context: Context) : ViewModel() {
@@ -68,7 +67,7 @@ class CreateMyRecipeViewModel(val context: Context) : ViewModel() {
 
     fun saveImageUri(uri: String) {
         viewModelScope.launch {
-            com.example.recipeapp.data.saveImageUriToDataStore(context, uri)// Save to DataStore
+            saveImageUriToDataStore(context, uri)// Save to DataStore
             _imageUriFlow.value = uri // Update StateFlow
         }
     }
