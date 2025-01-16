@@ -165,7 +165,8 @@ fun MainNavHost(
                 onNavigateToRecipeDetailScreen = { recipe ->
                     val recipeJson = Uri.encode(Json.encodeToString(recipe))
                     navController.navigate("${Route.RecipeDetailScreen.title}/${recipeJson}")
-                }
+                },
+                padding = paddingValues
             )
         }
 
