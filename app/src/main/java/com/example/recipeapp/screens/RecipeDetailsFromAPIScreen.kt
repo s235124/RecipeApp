@@ -57,14 +57,18 @@ fun RecipeDetailsFromAPIScreen(
                                 contentDescription = null
                             )
                         }
-
-                        IconButton(onClick = { onFavoriteClick(recipe) }) {
-                            val icon = if (RecipeExistsInFavourites) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder
-                            Icon(imageVector = icon, contentDescription = "Favourite icon")
-                        }
-                    }
+                    },
+                         actions = {
+                             IconButton(onClick = { onFavoriteClick(recipe) }) {
+                                 val icon =
+                                     if (RecipeExistsInFavourites) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder
+                                 Icon(imageVector = icon, contentDescription = "Favourite icon")
+                             }
+                         }
                 )
             }
+
+
             // Image first
             item {
                 AsyncImage(

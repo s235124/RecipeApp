@@ -87,7 +87,7 @@ fun MainNavHost(
             val recipeJson = backStackEntry.arguments?.getString("recipeJson") ?: ""
             val format = Json { ignoreUnknownKeys = true }
             val recipe = recipeJson.let {format.decodeFromString<RecipeItem>(Uri.decode(it))}
-            var isInFav = false
+            var isInFav = favorites.contains(recipe)
             RecipeDetailsFromAPIScreen(
                 innerPadding = paddingValues,
                 onBackButtonClick = { navController.popBackStack() },
