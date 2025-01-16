@@ -23,12 +23,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -38,12 +40,16 @@ import com.example.recipeapp.data.Category
 import com.example.recipeapp.data.CategoryAPI
 import com.example.recipeapp.data.Recipe
 import com.example.recipeapp.data.RecipeAPI
+import com.example.recipeapp.data.saveFavorites
 import com.example.recipeapp.navigation.MainNavHost
 import com.example.recipeapp.navigation.Route
 import com.example.recipeapp.screens.CategoriesViewModel
 import com.example.recipeapp.screens.RecipeViewModel
 import com.example.recipeapp.ui.theme.RecipeAppTheme
 import kotlinx.coroutines.launch
+import com.example.recipeapp.data.getFavorites
+import com.example.recipeapp.data.RecipeItem
+import kotlinx.coroutines.flow.collectLatest
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,6 +64,8 @@ class MainActivity : ComponentActivity() {
                 var categoriesAPI by remember { mutableStateOf(CategoryAPI()) }
                 var recipes by remember { mutableStateOf(emptyList<Recipe>()) }
                 var categories by remember { mutableStateOf(emptyList<Category>()) }
+                val favorites = remember { mutableStateListOf<RecipeItem>() }
+                val context = LocalContext.current
 
 
                 val previousTab = navController.previousBackStackEntry?.destination?.route
@@ -69,6 +77,10 @@ class MainActivity : ComponentActivity() {
 
                 // Fetch recipes on startup
                 LaunchedEffect(Unit) {
+                    getFavorites(context).collectLatest { savedFavorites ->
+                        favorites.clear()
+                        favorites.addAll(savedFavorites)
+                    }
                     coroutineScope.launch {
                         recipes = fetchRecipes()
                         categories = fetchCategories()
@@ -116,7 +128,13 @@ class MainActivity : ComponentActivity() {
                         recipesFromAPI = recipeAPI,
                         categoriesFromAPI = categoriesAPI,
                         recipes = recipes,
-                        categories = categories
+                        categories = categories,
+                        favorites = favorites,
+                        onSaveFavorites = { updatedFavorite ->
+                            coroutineScope.launch {
+                                saveFavorites(context, updatedFavorite)
+                            }
+                        }
                     )
                 }
             }

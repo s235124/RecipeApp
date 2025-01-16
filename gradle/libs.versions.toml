@@ -3,22 +3,22 @@ accompanistGlide = "0.32.0"
 accompanistGlideVersion = "0.30.1"
 agp = "8.6.1"
 coilCompose = "2.0.0"
-coreKtxVersion = "1.12.0"
+coreKtxVersion = "1.15.0"
 datastorePreferences = "1.1.1"
 googleAccompanistGlide = "0.29.1"
 googleAccompanistGlideVersion = "<latest_version>"
 gson = "2.10.1"
 kotlin = "1.9.0"
-coreKtx = "1.13.1"
+coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 kotlinxSerializationJson = "1.6.0"
-lifecycleRuntimeKtx = "2.8.6"
-activityCompose = "1.9.2"
-composeBom = "2024.04.01"
+lifecycleRuntimeKtx = "2.8.7"
+activityCompose = "1.9.3"
+composeBom = "2024.12.01"
 lifecycleViewmodelCompose = "2.8.7"
-navigationCompose = "2.8.3"
+navigationCompose = "2.8.5"
 activityKtx = "1.9.3"
 transportationConsumer = "3.0.0"
 datastoreCoreAndroid = "1.1.1"
@@ -27,9 +27,6 @@ retrofit = "2.9.0"
 retrofit2KotlinxSerializationConverter = "0.8.0"
 
 [libraries]
-accompanist-glide = { module = "com.google.accompanist:accompanist-glide", version.ref = "accompanistGlide" }
-accompanist-glide-v0291 = { module = "com.google.accompanist:accompanist-glide", version.ref = "googleAccompanistGlide" }
-accompanist-glide-v0301 = { module = "com.google.accompanist:accompanist-glide", version.ref = "accompanistGlideVersion" }
 accompanist-glide-vlatestversion = { module = "com.google.accompanist:accompanist-glide", version.ref = "googleAccompanistGlideVersion" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-core-ktx-v1120 = { module = "androidx.core:core-ktx", version.ref = "coreKtxVersion" }

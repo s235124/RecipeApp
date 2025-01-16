@@ -34,8 +34,8 @@ fun MainNavHost(
     navController: NavHostController,
     onRouteChanged: (Route) -> Unit,
     modifier: Modifier = Modifier,
-    //favorites: MutableList<Recipe>, //TODO: ADD THESE BACK LATER ON
-    //onSaveFavorites: (List<Recipe>) -> Unit,
+    favorites: MutableList<RecipeItem>, //TODO: ADD THESE BACK LATER ON
+    onSaveFavorites: (List<RecipeItem>) -> Unit,
     recipesFromAPI: RecipeAPI,
     categoriesFromAPI: CategoryAPI,
     recipes: List<Recipe>, // TODO: REMOVE WHEN RECIPES FROM API IS FULLY CHANGED IN ALL THE MODEL CLASSES
@@ -87,10 +87,20 @@ fun MainNavHost(
             val recipeJson = backStackEntry.arguments?.getString("recipeJson") ?: ""
             val format = Json { ignoreUnknownKeys = true }
             val recipe = recipeJson.let {format.decodeFromString<RecipeItem>(Uri.decode(it))}
+            var isInFav = false
             RecipeDetailsFromAPIScreen(
                 innerPadding = paddingValues,
                 onBackButtonClick = { navController.popBackStack() },
-                recipe = recipe
+                recipe = recipe,
+                onFavoriteClick = {
+                    if(favorites.contains(recipe)){
+                        favorites.remove(recipe)
+                    } else {
+                        favorites.add(recipe)
+                    }
+                    onSaveFavorites(favorites)
+                },
+                RecipeExistsInFavourites = isInFav,
             )
         }
 
@@ -117,12 +127,13 @@ fun MainNavHost(
         composable(Route.FavouritesScreen.title) {
             onRouteChanged(Route.FavouritesScreen)
             FavoritesScreen(
-                onNavigateToRecipeDetailScreen = {
-                    navController.navigate(Route.CreateMyRecipeScreen.title)
+                favorites = favorites,
+                onNavigateToRecipe = { recipe: RecipeItem -> navigateToAPIRecipeDetails(navController, recipe)
                 },
-                recipes = recipes
+
             )
         }
+
 
         composable(Route.MyRecipesScreen.title) {
             onRouteChanged(Route.MyRecipesScreen)
