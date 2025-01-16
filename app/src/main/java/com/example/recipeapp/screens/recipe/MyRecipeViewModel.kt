@@ -3,13 +3,11 @@ package com.example.recipeapp.screens.recipe
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.recipeapp.data.MyRecipeDataStore
 import com.example.recipeapp.data.Recipe
 import com.example.recipeapp.data.getMyRecipes
-import kotlinx.coroutines.flow.Flow
+import com.example.recipeapp.data.saveMyRecipes
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 
@@ -32,5 +30,21 @@ class MyRecipeViewModel(val context: Context) : ViewModel() {
         }
     }
 
+    fun deleteRecipe(recipe: Recipe) {
+        viewModelScope.launch {
+            try {
+                val updatedList = _recipes.value.toMutableList()
+                updatedList.remove(recipe)
+                _recipes.value = updatedList
+
+                // Optionally update persistent storage if necessary
+                saveMyRecipes(context,updatedList)
+            } catch (e: Exception) {
+                println("Error deleting recipe: ${e.message}")
+            }
+        }
+    }
 }
+
+
 

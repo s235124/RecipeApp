@@ -35,7 +35,8 @@ import com.example.recipeapp.model.RecipeCard
 @Composable
 fun MyRecipesScreen(
     onNewMyRecipeClick: () -> Unit,
-    onNavigateToRecipeDetailScreen: (Recipe) -> Unit
+    onNavigateToRecipeDetailScreen: (Recipe) -> Unit,
+
 ) {
     val context = LocalContext.current
 
