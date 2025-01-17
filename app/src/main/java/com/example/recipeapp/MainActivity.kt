@@ -81,10 +81,6 @@ class MainActivity : ComponentActivity() {
                         favorites.clear()
                         favorites.addAll(savedFavorites)
                     }
-                    coroutineScope.launch {
-                        recipes = fetchRecipes()
-                        categories = fetchCategories()
-                    }
                 }
 
                 Scaffold (
@@ -164,111 +160,11 @@ fun fetchCategoriesFromAPI(): CategoryAPI {
     else categories as CategoryAPI
 }
 
-// Simulated functions to fetch recipes and categories
-suspend fun fetchRecipes(): List<Recipe> {
-    // Replace with actual API call
-    val categories = fetchCategories() // Fetch categories with their associated recipes
-    return categories.flatMap { it.recipes } // Flatten the list of recipes from all categories
-}
 
 
-suspend fun fetchCategories(): List<Category> {
-    // Replace with actual API call
-    return listOf(
-
-        Category("Italy", R.drawable.flag_italy, recipes =  listOf(
-            Recipe(
-                "Spaghetti",
-                "25 min",
-                "Medium",
-                calories = "350 kcal",
-                imageRes = R.drawable.oip,
-                categories = "Italy",
-                description = "snxbdsxbs",
-                ingredient = "sxdsxsd",
-                imageUri = TODO(),
-                method = TODO()
-            ),
-            Recipe(
-                "Risotto",
-                "40 min",
-                "Hard",
-                calories = "500 kcal",
-                imageRes = R.drawable.oip,
-                categories = "Italy",
-                description = "dcdcwcxw",
-                ingredient = "xjnkwxkwjcn",
-                imageUri = TODO(),
-                method = TODO()
-            )
-        )),
-         Category("Lebanon", R.drawable.flag_lebanon, recipes =  listOf(
-        Recipe(
-            "Hummus",
-            "15 min",
-            "Easy",
-            calories = "200 kcal",
-            imageRes = R.drawable.oip,
-            categories = "Lebanon",
-            description = "cwhciubc",
-            ingredient = "hcowbcxwc",
-            imageUri = TODO(),
-            method = TODO()
-        ),
-        Recipe(
-            "Tabbouleh",
-            "30 min",
-            "Medium",
-            calories = "150 kcal",
-            imageRes = R.drawable.oip,
-            categories = "Lebanon",
-            description = "hcxhwinxi",
-            ingredient = "djkcbwchw",
-            imageUri = TODO(),
-            method = TODO()
-        )
-    )),
-        Category("Pakistan", R.drawable.flag_pakistan, recipes = listOf(
-        Recipe(
-            "Biryani",
-            "45 min",
-            "Hard",
-            calories = "600 kcal",
-            imageRes = R.drawable.oip,
-            categories = "Pakistan",
-            description = "jxcwjkbcw",
-            ingredient = "dxbewjkb xw ",
-            imageUri = TODO(),
-            method = TODO()
-        ),
-        Recipe(
-            "Kebab",
-            "30 min",
-            "Medium",
-            calories = "400 kcal",
-            imageRes = R.drawable.oip,
-            categories = "Pakistan",
-            description = "jdbcjdwbckjdw",
-            ingredient = "kcxdw cdh c",
-            imageUri = TODO(),
-            method = TODO()
-        )
-    ))
-    )
-}
-
-//@Composable
-//fun fetchData(): CategoryAPI? {
-//    val viewModel: APITestingViewModel = viewModel() // Proper ViewModel instantiation
-//    val recipeTags by viewModel.data.collectAsState(initial = null) // Collect StateFlow
-//
-////    println(recipeTags)
-//    return recipeTags
-//}
 
 @Composable
 fun BottomBar(
-    modifier: Modifier = Modifier,
     onHomeClick: () -> Unit,
     onMyRecipesClick: () -> Unit,
     onSearchClick: () -> Unit,
