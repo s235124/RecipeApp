@@ -90,7 +90,7 @@ fun CreateMyRecipe(
     var showDifficultyDialog by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
 
-    val savedUri by viewModel.imageUriFlow.collectAsState()
+    //val savedUri by viewModel.imageUriFlow.collectAsState()
 
     // Restore saved image URI from ViewModel or DataStore
 //    LaunchedEffect(savedUri) {
@@ -102,7 +102,7 @@ fun CreateMyRecipe(
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
             imageUri = uri
-            viewModel.saveImageUri(uri.toString()) // Save image URI to DataStore
+            //viewModel.saveImageUri(uri.toString()) // Save image URI to DataStore
         }
     }
 
@@ -352,8 +352,8 @@ fun CreateMyRecipe(
                                 description = description,
                                 imageUri = imageUri?.toString(),
                                 categories = "Custom",
-                                ingredient = ingredients,
-                                method = method
+                                ingredient = ingredients.toString(),
+                                method = method.toString()
                             )
                         )
                         onSaveClick()

@@ -1,6 +1,6 @@
 package com.example.recipeapp.navigation
 
-import CreateMyRecipe
+
 import android.net.Uri
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -204,7 +204,7 @@ fun MainNavHost(
             onRouteChanged(Route.CreateMyRecipeScreen)
             CreateMyRecipe(
                 onSaveClick = { navController.popBackStack() },
-                paddingValues = TODO(),
+                paddingValues = paddingValues,
                 onCancelClick = { navController.popBackStack() }
             )
         }
