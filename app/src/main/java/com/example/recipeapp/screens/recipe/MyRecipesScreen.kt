@@ -2,18 +2,22 @@ package com.example.recipeapp.screens.recipe
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -30,9 +34,98 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.recipeapp.data.Recipe
 import com.example.recipeapp.model.RecipeCard
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun MyRecipesScreen(
+    onNewMyRecipeClick: () -> Unit,
+    onNavigateToRecipeDetailScreen: (Recipe) -> Unit
+) {
+    val context = LocalContext.current
+
+    // Initialize MyRecipeViewModel using the factory
+    val viewModel: MyRecipeViewModel = viewModel(
+        factory = MyRecipeViewModelFactory(context)
+    )
+    // Observe the saved recipes from the ViewModel
+    val savedRecipes = viewModel.recipes.collectAsState().value
+
+    // Debug logs for UI state
+    LaunchedEffect(savedRecipes) {
+        Log.d("MyRecipesScreen", "Saved recipes observed: $savedRecipes")
+    }
+
+    // manual add top bar
+    Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 0.dp)
+        ) {
+            TopAppBar(
+                title = { Text("My Recipes") },
+                actions = {
+                    IconButton(onClick = { onNewMyRecipeClick() }) {
+                        Icon(
+                            imageVector = Icons.Filled.AddCircle,
+                            contentDescription = "Add Recipe",
+                            tint = Color(0xFF78B17E)
+                        )
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        // Content area (LazyVerticalGrid)
+        if (savedRecipes.isEmpty()) {
+            // No recipes saved
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 56.dp), // avoid top bar overlap
+                contentAlignment = Alignment.Center
+            ) {
+                Text("No recipes saved yet.")
+            }
+        } else {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 56.dp), //  avoid overlap wit topbar
+                contentPadding = PaddingValues(8.dp)
+            ) {
+                items(savedRecipes) { recipe ->
+                    RecipeCard(
+                        recipe = recipe,
+                        onNavigateToRecipeDetailScreen = { onNavigateToRecipeDetailScreen(recipe) },
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
+                // add spacer at the bottom to avoid cut off by bottom bar
+                item {
+                    Spacer(modifier = Modifier.height(64.dp))
+                }
+            }
+        }
+    }
+}
+
+class MyRecipeViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(MyRecipeViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return MyRecipeViewModel(context) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
+
+
+
+/* kode uden scaffold
 fun MyRecipesScreen(
     onNewMyRecipeClick: () -> Unit,
     onNavigateToRecipeDetailScreen: (Recipe) -> Unit
@@ -79,7 +172,7 @@ fun MyRecipesScreen(
             }
         } else {
             // Display the saved recipes using RecipeCard
-            LazyColumn(
+            /*LazyColumn(
                 modifier = Modifier
                     .padding(padding)
                     .fillMaxSize(),
@@ -91,6 +184,26 @@ fun MyRecipesScreen(
                         onNavigateToRecipeDetailScreen = { onNavigateToRecipeDetailScreen(recipe) },
                         modifier = Modifier.padding(8.dp)
                     )
+                }
+            }*/
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxSize(),
+                contentPadding = PaddingValues(8.dp)
+            ) {
+                items(savedRecipes) { recipe ->
+                    RecipeCard(
+                        recipe = recipe,
+                        onNavigateToRecipeDetailScreen = { onNavigateToRecipeDetailScreen(recipe) },
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
+                item {
+                    Spacer(modifier = Modifier.height(64.dp)) // spacer since the bottom recipes are cut off  by the bottom bar
                 }
             }
         }
@@ -106,3 +219,4 @@ class MyRecipeViewModelFactory(private val context: Context) : ViewModelProvider
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
+*/
