@@ -25,17 +25,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import com.example.recipeapp.data.Recipe
+import com.example.recipeapp.viewmodel.RecipeViewModel2
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecipeDetailScreen(onBackButtonClick: () -> Unit, recipe: Recipe) {
-
+fun RecipeDetailScreen(
+    onBackButtonClick: () -> Unit,
+    viewModel: RecipeViewModel2,
+    recipeName: String
+) {
+    val recipe = viewModel.chosenRecipe.value
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(recipe.name) },
+                title = {
+                    if (recipe != null) {
+                        Text(recipe.name)
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackButtonClick) {
                         Icon(
@@ -54,26 +62,29 @@ fun RecipeDetailScreen(onBackButtonClick: () -> Unit, recipe: Recipe) {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            if (recipe.imageUri != null) {
-                Image(
-                    painter = rememberAsyncImagePainter(model = recipe.imageUri),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clip(CircleShape)
-                        .align(Alignment.CenterHorizontally)
-                )
-            }
-            Text(text = "Time: ${recipe.time}")
-            Text(text = "Difficulty: ${recipe.difficulty}")
-            Text(text = "Calories: ${recipe.calories}")
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "Description:", style = MaterialTheme.typography.titleMedium)
-            Text(text = recipe.description)
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "Ingredients:", style = MaterialTheme.typography.titleMedium)
-            recipe.ingredient.forEach { ingredient ->
-                Text(text = "- $ingredient")
+            if (recipe != null) {
+                if (recipe.imageUri != null) {
+                    Image(
+                        painter = rememberAsyncImagePainter(model = recipe.imageUri),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(CircleShape)
+                            .align(Alignment.CenterHorizontally)
+                    )
+                }
+
+                Text(text = "Time: ${recipe.time}")
+                Text(text = "Difficulty: ${recipe.difficulty}")
+                Text(text = "Calories: ${recipe.calories}")
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(text = "Description:", style = MaterialTheme.typography.titleMedium)
+                Text(text = recipe.description)
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(text = "Ingredients:", style = MaterialTheme.typography.titleMedium)
+                recipe.ingredient.forEach { ingredient ->
+                    Text(text = "- $ingredient")
+                }
             }
         }
     }
