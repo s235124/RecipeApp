@@ -27,6 +27,7 @@ import com.example.recipeapp.screens.MainScreen
 import com.example.recipeapp.screens.RecipeDetailScreen
 import com.example.recipeapp.screens.RecipeDetailsFromAPIScreen
 import com.example.recipeapp.screens.SearchScreen
+import com.example.recipeapp.screens.createmyscreen.CreateMyRecipe
 import com.example.recipeapp.screens.recipe.MyRecipeViewModel
 import com.example.recipeapp.screens.recipe.MyRecipeViewModelFactory
 import com.example.recipeapp.screens.recipe.MyRecipesScreen
@@ -201,7 +202,11 @@ fun MainNavHost(
 
         composable(Route.CreateMyRecipeScreen.title) {
             onRouteChanged(Route.CreateMyRecipeScreen)
-            CreateMyRecipe(onSaveClick = { navController.popBackStack() })
+            CreateMyRecipe(
+                onSaveClick = { navController.popBackStack() },
+                paddingValues = TODO(),
+                onCancelClick = { navController.popBackStack() }
+            )
         }
     }
 }
