@@ -3,7 +3,11 @@ package com.example.recipeapp.model
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -43,17 +47,7 @@ fun RecipeCard(
             modifier = Modifier.padding(0.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Check if imageRes is available; otherwise, use imageUri
-            if (recipe.imageRes != null) {
-                Image(
-                    painter = painterResource(id = recipe.imageRes),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp)
-                )
-            } else if (recipe.imageUri != null) {
+            if (recipe.imageUri != null) {
                 Image(
                     painter = rememberAsyncImagePainter(model = Uri.parse(recipe.imageUri)),
                     contentDescription = null,

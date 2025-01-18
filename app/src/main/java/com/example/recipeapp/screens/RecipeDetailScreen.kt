@@ -1,6 +1,7 @@
 package com.example.recipeapp.screens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -23,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -60,11 +60,10 @@ fun RecipeDetailScreen(
             modifier = Modifier.padding(top = 16.dp)
         ) {
             item {
-                val img: Painter = if (recipe.imageUri == null) {
-                    painterResource(R.drawable.oip)
-                } else {
-                    rememberAsyncImagePainter(model = recipe.imageUri)
-                }
+                Log.d("recipe details", "${recipe.imageUri}")
+                val img: Painter = rememberAsyncImagePainter(
+                    model = recipe.imageUri ?: R.drawable.oip
+                )
 
                 Image(
                     painter = img,
