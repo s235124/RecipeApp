@@ -1,6 +1,7 @@
+import android.annotation.SuppressLint
 package com.example.recipeapp.screens.createmyscreen
 
-import android.annotation.SuppressLint
+import android.app.TimePickerDialog
 import android.content.Context
 import android.net.Uri
 import android.widget.NumberPicker
@@ -8,6 +9,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +25,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
@@ -54,6 +57,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.recipeapp.data.Recipe
+import com.example.recipeapp.screens.createmyscreen.CreateMyRecipeViewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.foundation.layout.Row
 
 @Composable
 fun CreateMyRecipe(
@@ -78,8 +85,8 @@ fun CreateMyRecipe(
         viewModel(factory = CreateMyRecipeViewModelFactory(context))
 
     var name by remember { mutableStateOf("") }
-    var time by remember { mutableStateOf("Select Time") }
-    var difficulty by remember { mutableStateOf("Select Difficulty") }
+    var time by remember { mutableStateOf("") }
+    var difficulty by remember { mutableStateOf("") }
     var calories by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var ingredients by remember { mutableStateOf(listOf<String>()) }  // List to hold ingredients
@@ -89,6 +96,7 @@ fun CreateMyRecipe(
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var showDifficultyDialog by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
+
 
     //val savedUri by viewModel.imageUriFlow.collectAsState()
 
@@ -102,7 +110,7 @@ fun CreateMyRecipe(
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
             imageUri = uri
-            //viewModel.saveImageUri(uri.toString()) // Save image URI to DataStore
+            viewModel.saveImageUri(uri.toString()) // Save image URI to DataStore
         }
     }
 
@@ -115,6 +123,27 @@ fun CreateMyRecipe(
         )
     }
 
+    //Logik for knappene på skærmen  (tids- og sværhedsvælger)
+
+
+    if (showTimePicker) {
+        TimePickerDialo(
+            onDismiss = { showTimePicker = false },
+            onTimeSelected = { selectedTime ->
+                time = selectedTime }
+        )
+    }
+
+    if (showDifficultyDialog) {
+        ShowDifficultyDialog(
+            onDismiss = { showDifficultyDialog = false },
+            onDifficultySelected = { selectedDifficulty ->
+                difficulty = selectedDifficulty
+            }
+        )
+    }
+
+    //---------------------------
     if (showDifficultyDialog) {
         ShowDifficultyDialog(
             onDismiss = { showDifficultyDialog = false },
@@ -203,6 +232,36 @@ fun CreateMyRecipe(
                     colors = textFieldColors
                 )
             }
+            // Input Fields
+        TextField(
+            value = name,
+            onValueChange = { name = it },
+            label = { Text("Recipe Name") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+
+        Button(
+            onClick = { showTimePicker = true },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(time) //Viser valgt tid or standardtekst
+        }
+
+        //Sværhedsgrad knap
+        Button(
+            onClick = { showDifficultyDialog = true },
+            modifier = Modifier.fillMaxWidth()
+        ){
+            Text(difficulty)
+        }
+
+        TextField(
+            value = calories,
+            onValueChange = { calories = it },
+            label = { Text("Calories") },
+            modifier = Modifier.fillMaxWidth()
+        )
 
             // Description
             item {
