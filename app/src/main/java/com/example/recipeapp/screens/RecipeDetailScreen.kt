@@ -1,7 +1,6 @@
 package com.example.recipeapp.screens
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -57,12 +56,11 @@ fun RecipeDetailScreen(
             }
         )
         LazyColumn (
-            modifier = Modifier.padding(top = 16.dp)
+//            modifier = Modifier.padding(top = 16.dp)
         ) {
             item {
-                Log.d("recipe details", "${recipe.imageUri}")
                 val img: Painter = rememberAsyncImagePainter(
-                    model = recipe.imageUri ?: R.drawable.oip
+                    model = recipe.imageUri ?: R.drawable.no_image_available_icon
                 )
 
                 Image(

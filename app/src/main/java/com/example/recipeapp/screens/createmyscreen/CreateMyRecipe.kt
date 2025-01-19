@@ -34,7 +34,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -78,8 +77,8 @@ fun CreateMyRecipe(
         viewModel(factory = CreateMyRecipeViewModelFactory(context))
 
     var name by remember { mutableStateOf("") }
-    var time by remember { mutableStateOf("Select Time") }
-    var difficulty by remember { mutableStateOf("Select Difficulty") }
+    var time by remember { mutableStateOf("") }
+    var difficulty by remember { mutableStateOf("") }
     var calories by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var ingredients by remember { mutableStateOf(listOf<String>()) }  // List to hold ingredients
@@ -87,22 +86,14 @@ fun CreateMyRecipe(
     var method by remember { mutableStateOf(listOf<String>()) }
     var step by remember { mutableStateOf("") }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
+
     var showDifficultyDialog by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
-
-    val savedUri by viewModel.imageUriFlow.collectAsState()
-
-    // Restore saved image URI from ViewModel or DataStore
-//    LaunchedEffect(savedUri) {
-//        if (savedUri != null) {
-//            imageUri = Uri.parse(savedUri)
-//        }
-//    }
+    var showFillInBlanksPopUp by remember { mutableStateOf(false) }
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
-            imageUri = uri
-            viewModel.saveImageUri(uri.toString()) // Save image URI to DataStore
+            imageUri = viewModel.copyImageToAppStorage(context, uri)
         }
     }
 
@@ -124,6 +115,12 @@ fun CreateMyRecipe(
         )
     }
 
+    if (showFillInBlanksPopUp) {
+        ShowFillInBlanksPopUp(
+            onDismiss = { showFillInBlanksPopUp = false }
+        )
+    }
+
     //---------------------------
 
     Box (
@@ -132,7 +129,7 @@ fun CreateMyRecipe(
         LazyColumn(
             modifier = Modifier
                 .padding(
-                    top = paddingValues.calculateTopPadding(),
+                    top = 16.dp,
                     bottom = paddingValues.calculateBottomPadding(),
                     start = 16.dp,
                     end = 16.dp
@@ -178,7 +175,8 @@ fun CreateMyRecipe(
                     modifier = Modifier.fillMaxWidth(),
                     colors = buttonColors
                 ) {
-                    Text(time) // Shows selected time or default text
+                    val timeText = time.ifBlank { "Select Time" }
+                    Text(timeText) // Shows selected time or default text
                 }
             }
 
@@ -189,7 +187,8 @@ fun CreateMyRecipe(
                     modifier = Modifier.fillMaxWidth(),
                     colors = buttonColors
                 ) {
-                    Text(difficulty)
+                    val diffText = difficulty.ifBlank { "Select Difficulty" }
+                    Text(diffText)
                 }
             }
 
@@ -197,11 +196,16 @@ fun CreateMyRecipe(
             item {
                 TextField(
                     value = calories,
-                    onValueChange = { calories = it },
+                    onValueChange = {
+                        if (it.matches(Regex("^[0-9]*$"))) { // Allows only numeric input
+                            calories = it
+                        }
+                    },
                     label = { Text("Calories") },
                     modifier = Modifier.fillMaxWidth(),
                     colors = textFieldColors
                 )
+
             }
 
             // Description
@@ -343,20 +347,32 @@ fun CreateMyRecipe(
             item {
                 Button(
                     onClick = {
-                        viewModel.saveRecipe(
-                            Recipe(
-                                name = name,
-                                time = time,
-                                difficulty = difficulty,
-                                calories = calories,
-                                description = description,
-                                imageUri = imageUri?.toString(),
-                                categories = "Custom",
-                                ingredient = ingredients,
-                                method = method
+                        if (name.isEmpty() ||
+                            time.isEmpty() ||
+                            difficulty.isEmpty() ||
+                            calories.isEmpty() ||
+                            description.isEmpty() ||
+                            ingredients.isEmpty() ||
+                            method.isEmpty()
+                            ) {
+                            showFillInBlanksPopUp = true
+                        }
+                        else {
+                            viewModel.saveRecipe(
+                                Recipe(
+                                    name = name,
+                                    time = time,
+                                    difficulty = difficulty,
+                                    calories = calories,
+                                    description = description,
+                                    imageUri = imageUri?.toString(),
+                                    categories = "Custom",
+                                    ingredient = ingredients,
+                                    method = method
+                                )
                             )
-                        )
-                        onSaveClick()
+                            onSaveClick()
+                        }
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = buttonColors
@@ -559,5 +575,30 @@ fun ShowDifficultyDialog(
 
 }
 
+@Composable
+fun ShowFillInBlanksPopUp(
+    onDismiss: () -> Unit,
+) {
+    val buttonColors = ButtonDefaults.buttonColors(
+        containerColor = Color(0xFF78B17E),
+        contentColor = Color.White,
+        disabledContainerColor = Color(0xFFE8F5E9),
+        disabledContentColor = Color(0xFFB0BEC5)
+    )
 
-
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Warning") },
+        text = { Text("Please fill out all information for your recipe.") },
+        confirmButton = { },
+        dismissButton = {
+            Button(
+                onClick = onDismiss,
+                content = {
+                    Text("Dismiss")
+                },
+                colors = buttonColors
+            )
+        }
+    )
+}

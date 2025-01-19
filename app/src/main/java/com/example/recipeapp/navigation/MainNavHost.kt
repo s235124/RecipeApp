@@ -162,6 +162,7 @@ fun MainNavHost(
         composable(Route.MyRecipesScreen.title) {
             onRouteChanged(Route.MyRecipesScreen)
             MyRecipesScreen(
+                paddingValues = paddingValues,
                 onNewMyRecipeClick = {
                     navController.navigate(Route.CreateMyRecipeScreen.title)
                 },

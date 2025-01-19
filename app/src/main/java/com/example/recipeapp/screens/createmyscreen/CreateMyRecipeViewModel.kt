@@ -1,6 +1,7 @@
 package com.example.recipeapp.screens.createmyscreen
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import java.io.File
 
 
 class CreateMyRecipeViewModel(val context: Context) : ViewModel() {
@@ -69,6 +71,24 @@ class CreateMyRecipeViewModel(val context: Context) : ViewModel() {
         viewModelScope.launch {
             saveImageUriToDataStore(context, uri)// Save to DataStore
             _imageUriFlow.value = uri // Update StateFlow
+        }
+    }
+
+    fun copyImageToAppStorage(context: Context, sourceUri: Uri): Uri? {
+        return try {
+            val inputStream = context.contentResolver.openInputStream(sourceUri) ?: return null
+            val file = File(context.filesDir, "saved_image.jpg")
+            val outputStream = file.outputStream()
+
+            inputStream.use { input ->
+                outputStream.use { output ->
+                    input.copyTo(output)
+                }
+            }
+            Uri.fromFile(file) // Return the new URI
+        } catch (e: Exception) {
+            Log.e("CopyImage", "Error copying image: ${e.message}")
+            null
         }
     }
 

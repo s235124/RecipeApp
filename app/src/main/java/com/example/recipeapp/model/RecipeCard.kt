@@ -59,7 +59,7 @@ fun RecipeCard(
             }
             else {
                 Image(
-                    painter = painterResource(R.drawable.oip),
+                    painter = painterResource(R.drawable.no_image_available_icon),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
