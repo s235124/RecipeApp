@@ -1,6 +1,6 @@
-import android.annotation.SuppressLint
 package com.example.recipeapp.screens.createmyscreen
 
+import android.annotation.SuppressLint
 import android.app.TimePickerDialog
 import android.content.Context
 import android.net.Uri
@@ -127,7 +127,7 @@ fun CreateMyRecipe(
 
 
     if (showTimePicker) {
-        TimePickerDialo(
+        TimePickerDialog(
             onDismiss = { showTimePicker = false },
             onTimeSelected = { selectedTime ->
                 time = selectedTime }
@@ -233,35 +233,42 @@ fun CreateMyRecipe(
                 )
             }
             // Input Fields
-        TextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text("Recipe Name") },
-            modifier = Modifier.fillMaxWidth()
-        )
+            item {
+                TextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Recipe Name") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
 
-
-        Button(
-            onClick = { showTimePicker = true },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(time) //Viser valgt tid or standardtekst
-        }
+            item {
+                Button(
+                    onClick = { showTimePicker = true },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(time) //Viser valgt tid or standardtekst
+                }
+            }
 
         //Sværhedsgrad knap
-        Button(
-            onClick = { showDifficultyDialog = true },
-            modifier = Modifier.fillMaxWidth()
-        ){
-            Text(difficulty)
-        }
+            item {
+                Button(
+                    onClick = { showDifficultyDialog = true },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(difficulty)
+                }
+            }
 
-        TextField(
-            value = calories,
-            onValueChange = { calories = it },
-            label = { Text("Calories") },
-            modifier = Modifier.fillMaxWidth()
-        )
+            item {
+                TextField(
+                    value = calories,
+                    onValueChange = { calories = it },
+                    label = { Text("Calories") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
 
             // Description
             item {
