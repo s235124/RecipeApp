@@ -13,7 +13,6 @@ data class Recipe(
     val calories: String,
     val imageUri: String? = null,
     val imageRes: Int? = null,
-    val categories: String,
-    val method: String
+    val categories: String
 )
 

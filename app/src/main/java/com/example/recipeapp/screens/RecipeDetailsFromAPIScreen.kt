@@ -37,7 +37,7 @@ fun RecipeDetailsFromAPIScreen(
     onBackButtonClick: () -> Unit,
     recipe: RecipeItem,
     onFavoriteClick: (RecipeItem) -> Unit,
-    RecipeExistsInFavourites: Boolean,
+    recipeExistsInFavourites: Boolean,
 ) {
     Column(
         modifier = Modifier
@@ -58,7 +58,7 @@ fun RecipeDetailsFromAPIScreen(
             actions = {
                 IconButton(onClick = { onFavoriteClick(recipe) }) {
                     val icon =
-                        if (RecipeExistsInFavourites) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder
+                        if (recipeExistsInFavourites) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder
                     Icon(imageVector = icon, contentDescription = "Favourite icon")
                 }
             }

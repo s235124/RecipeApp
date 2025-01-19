@@ -12,11 +12,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import com.example.recipeapp.data.RecipeItem
 
 val Context.MyRecipeDataStore: DataStore<Preferences> by preferencesDataStore(name = "MyRecipe")
 val SAVED_RECIPES_KEY = stringPreferencesKey("MyRecipe_")
 
+val Context.dataStore by preferencesDataStore(name = "recipe_data_store")
+val IMAGE_URI_KEY = stringPreferencesKey("image_uri")
 
 val Context.MyfavoriteRecipeDataStore: DataStore<Preferences> by preferencesDataStore(name = "favorites")
 val FAVORITES_KEY = stringPreferencesKey("favorite_personas")
@@ -52,24 +53,37 @@ fun getMyRecipes(context: Context): Flow<List<Recipe>> {
     }
 
 }
-    suspend fun saveFavorites(context: Context, favorites: List<RecipeItem>) {
-        val jsonString = Json.encodeToString(favorites)
-        context.MyfavoriteRecipeDataStore.edit { preferences ->
-            preferences[FAVORITES_KEY] = jsonString
-            println("Saved Favorites: $jsonString") // Debug log
+
+suspend fun saveFavorites(context: Context, favorites: List<RecipeItem>) {
+    val jsonString = Json.encodeToString(favorites)
+    context.MyfavoriteRecipeDataStore.edit { preferences ->
+        preferences[FAVORITES_KEY] = jsonString
+        println("Saved Favorites: $jsonString") // Debug log
+    }
+}
+
+fun getFavorites(context: Context): Flow<List<RecipeItem>> {
+    return context.MyfavoriteRecipeDataStore.data
+        .map { preferences ->
+            val jsonString = preferences[FAVORITES_KEY] ?: ""
+            println("Retrieved Favorites: $jsonString") // Debug log
+            if (jsonString.isNotEmpty()) Json.decodeFromString(jsonString) else emptyList()
         }
+}
+
+// Save Image URI
+suspend fun saveImageUriToDataStore(context: Context, uri: String) {
+    context.dataStore.edit { preferences ->
+        preferences[IMAGE_URI_KEY] = uri
     }
+}
 
-    fun getFavorites(context: Context): Flow<List<RecipeItem>> {
-        return context.MyfavoriteRecipeDataStore.data
-            .map { preferences ->
-                val jsonString = preferences[FAVORITES_KEY] ?: ""
-                println("Retrieved Favorites: $jsonString") // Debug log
-                if (jsonString.isNotEmpty()) Json.decodeFromString(jsonString) else emptyList()
-            }
+// Retrieve Image URI
+fun getImageUri(context: Context): Flow<String?> {
+    return context.dataStore.data.map { preferences ->
+        preferences[IMAGE_URI_KEY]
     }
-
-
+}
 
 
 

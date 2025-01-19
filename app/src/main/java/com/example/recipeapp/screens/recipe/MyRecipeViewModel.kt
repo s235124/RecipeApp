@@ -44,6 +44,20 @@ class MyRecipeViewModel(val context: Context) : ViewModel() {
             }
         }
     }
+
+    fun deleteAllRecipes() {
+        viewModelScope.launch {
+            try {
+                val updatedList = emptyList<Recipe>()
+                _recipes.value = updatedList
+
+                // Optionally update persistent storage if necessary
+                saveMyRecipes(context,updatedList)
+            } catch (e: Exception) {
+                println("Error deleting recipe: ${e.message}")
+            }
+        }
+    }
 }
 
 

@@ -40,7 +40,7 @@ fun RecipeDetailScreen(
     onBackButtonClick: () -> Unit,
     recipe: Recipe,
     onDeleteClick: (Recipe) -> Unit,
-    RecipeCardExisteInMyRecipe: Boolean
+    recipeCardExistsInMyRecipe: Boolean
 
 ) {
     Column(
@@ -58,11 +58,16 @@ fun RecipeDetailScreen(
                         contentDescription = null
                     )
                 }
+            },
+            actions = {
+                IconButton(onClick = { onDeleteClick(recipe) }) {
+                    val icon =
+                        if (recipeCardExistsInMyRecipe) Icons.Filled.Delete else Icons.Outlined.Delete
+                    Icon(imageVector = icon, contentDescription = "delete icon")
+                }
             }
         )
-        LazyColumn (
-//            modifier = Modifier.padding(top = 16.dp)
-        ) {
+        LazyColumn {
             item {
                 val img: Painter = rememberAsyncImagePainter(
                     model = recipe.imageUri ?: R.drawable.no_image_available_icon

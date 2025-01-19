@@ -41,6 +41,7 @@ fun Chips(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(40.dp)
+                .padding(horizontal = 12.dp)
         ) {
             Text(
                 text = category.title.replace("&amp;", "&"),
@@ -54,6 +55,7 @@ fun Chips(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(40.dp)
+                .padding(horizontal = 12.dp)
         ) {
             Text(
                 text = category.description.replace("&amp;", "&"),

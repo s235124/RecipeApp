@@ -40,16 +40,16 @@ import com.example.recipeapp.data.Category
 import com.example.recipeapp.data.CategoryAPI
 import com.example.recipeapp.data.Recipe
 import com.example.recipeapp.data.RecipeAPI
+import com.example.recipeapp.data.RecipeItem
+import com.example.recipeapp.data.getFavorites
 import com.example.recipeapp.data.saveFavorites
 import com.example.recipeapp.navigation.MainNavHost
 import com.example.recipeapp.navigation.Route
 import com.example.recipeapp.screens.CategoriesViewModel
 import com.example.recipeapp.screens.RecipeViewModel
 import com.example.recipeapp.ui.theme.RecipeAppTheme
-import kotlinx.coroutines.launch
-import com.example.recipeapp.data.getFavorites
-import com.example.recipeapp.data.RecipeItem
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -123,8 +123,6 @@ class MainActivity : ComponentActivity() {
                             .padding(innerPadding),
                         recipesFromAPI = recipeAPI,
                         categoriesFromAPI = categoriesAPI,
-                        recipes = recipes,
-                        categories = categories,
                         favorites = favorites,
                         onSaveFavorites = { updatedFavorite ->
                             coroutineScope.launch {

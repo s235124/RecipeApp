@@ -63,7 +63,6 @@ fun SearchScreen(
                     contentDescription = "Search Icon",
                     tint = iconColor,
                     modifier = Modifier
-                        .padding(16.dp, 0.dp, 0.dp, 0.dp)
                         .size(32.dp)
                 )
             }
