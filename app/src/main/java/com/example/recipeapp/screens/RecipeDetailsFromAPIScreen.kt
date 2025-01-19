@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -33,7 +35,9 @@ import com.example.recipeapp.data.RecipeItem
 fun RecipeDetailsFromAPIScreen(
     innerPadding: PaddingValues,
     onBackButtonClick: () -> Unit,
-    recipe: RecipeItem
+    recipe: RecipeItem,
+    onFavoriteClick: (RecipeItem) -> Unit,
+    RecipeExistsInFavourites: Boolean,
 ) {
     Column(
         modifier = Modifier
@@ -49,6 +53,13 @@ fun RecipeDetailsFromAPIScreen(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = null
                     )
+                }
+            },
+            actions = {
+                IconButton(onClick = { onFavoriteClick(recipe) }) {
+                    val icon =
+                        if (RecipeExistsInFavourites) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder
+                    Icon(imageVector = icon, contentDescription = "Favourite icon")
                 }
             }
         )

@@ -5,26 +5,34 @@ import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -35,9 +43,9 @@ import com.example.recipeapp.model.RecipeCard
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyRecipesScreen(
-    paddingValues: PaddingValues,
     onNewMyRecipeClick: () -> Unit,
-    onNavigateToRecipeDetailScreen: (Recipe) -> Unit
+    onNavigateToRecipeDetailScreen: (Recipe) -> Unit,
+    padding : PaddingValues
 ) {
     val context = LocalContext.current
 
@@ -48,10 +56,6 @@ fun MyRecipesScreen(
     // Observe the saved recipes from the ViewModel
     val savedRecipes = viewModel.recipes.collectAsState().value
 
-    // Debug logs for UI state
-    LaunchedEffect(savedRecipes) {
-        Log.d("MyRecipesScreen", "Saved recipes observed: $savedRecipes")
-    }
 
     // manual add top bar
     Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
@@ -61,7 +65,7 @@ fun MyRecipesScreen(
                 .padding(top = 0.dp)
         ) {
             TopAppBar(
-                title = { Text("My Recipes") },
+                title = { Text("My Recipes", fontWeight = FontWeight.Bold) },
                 actions = {
                     IconButton(onClick = { onNewMyRecipeClick() }) {
                         Icon(

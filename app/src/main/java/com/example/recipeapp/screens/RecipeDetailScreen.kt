@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -36,7 +38,10 @@ import com.example.recipeapp.data.Recipe
 fun RecipeDetailScreen(
     innerPadding: PaddingValues,
     onBackButtonClick: () -> Unit,
-    recipe: Recipe
+    recipe: Recipe,
+    onDeleteClick: (Recipe) -> Unit,
+    RecipeCardExisteInMyRecipe: Boolean
+
 ) {
     Column(
         modifier = Modifier

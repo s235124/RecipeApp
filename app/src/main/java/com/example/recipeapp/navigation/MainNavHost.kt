@@ -1,5 +1,6 @@
 package com.example.recipeapp.navigation
 
+
 import android.net.Uri
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -14,8 +15,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -29,10 +32,9 @@ import com.example.recipeapp.screens.CategoryRecipesScreen
 import com.example.recipeapp.screens.FavoritesScreen
 import com.example.recipeapp.screens.MainScreen
 import com.example.recipeapp.screens.RecipeDetailScreen
+import com.example.recipeapp.screens.recipe.MyRecipesScreen
 import com.example.recipeapp.screens.RecipeDetailsFromAPIScreen
 import com.example.recipeapp.screens.SearchScreen
-import com.example.recipeapp.screens.createmyscreen.CreateMyRecipe
-import com.example.recipeapp.screens.recipe.MyRecipesScreen
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -42,8 +44,8 @@ fun MainNavHost(
     navController: NavHostController,
     onRouteChanged: (Route) -> Unit,
     modifier: Modifier = Modifier,
-    //favorites: MutableList<Recipe>, //TODO: ADD THESE BACK LATER ON
-    //onSaveFavorites: (List<Recipe>) -> Unit,
+    favorites: MutableList<RecipeItem>, //TODO: ADD THESE BACK LATER ON
+    onSaveFavorites: (List<RecipeItem>) -> Unit,
     recipesFromAPI: RecipeAPI,
     categoriesFromAPI: CategoryAPI,
     recipes: List<Recipe>, // TODO: REMOVE WHEN RECIPES FROM API IS FULLY CHANGED IN ALL THE MODEL CLASSES
@@ -116,6 +118,22 @@ fun MainNavHost(
                     recipe = recipe
                 )
             }
+            val recipe = recipeJson.let {format.decodeFromString<RecipeItem>(Uri.decode(it))}
+            var isInFav = favorites.contains(recipe)
+            RecipeDetailsFromAPIScreen(
+                innerPadding = paddingValues,
+                onBackButtonClick = { navController.popBackStack() },
+                recipe = recipe,
+                onFavoriteClick = {
+                    if(favorites.contains(recipe)){
+                        favorites.remove(recipe)
+                    } else {
+                        favorites.add(recipe)
+                    }
+                    onSaveFavorites(favorites)
+                },
+                RecipeExistsInFavourites = isInFav,
+            )
         }
 
 
@@ -147,17 +165,39 @@ fun MainNavHost(
                     recipe = recipe
                 )
             }
+
+            // Initialize ViewModel and recipes list
+            val context = LocalContext.current
+            val viewModel: MyRecipeViewModel = viewModel(factory = MyRecipeViewModelFactory(context))
+            val savedRecipes = viewModel.recipes.collectAsState().value
+
+            // Check if the recipe exists in the saved list
+            val isInSavedRecipes = savedRecipes.contains(recipe)
+
+            RecipeDetailScreen(
+                innerPadding = paddingValues,
+                onBackButtonClick = { navController.popBackStack() },
+                recipe = recipe,
+                onDeleteClick = {
+                    if (isInSavedRecipes) {
+                        viewModel.deleteRecipe(recipe) // Remove from saved recipes
+                    }
+                    navController.popBackStack() // Navigate back
+                },
+                RecipeCardExisteInMyRecipe = isInSavedRecipes
+            )
         }
 
         composable(Route.FavouritesScreen.title) {
             onRouteChanged(Route.FavouritesScreen)
             FavoritesScreen(
-                onNavigateToRecipeDetailScreen = {
-                    navController.navigate(Route.CreateMyRecipeScreen.title)
+                favorites = favorites,
+                onNavigateToRecipe = { recipe: RecipeItem -> navigateToAPIRecipeDetails(navController, recipe)
                 },
-                recipes = recipes
+                padding = paddingValues
             )
         }
+
 
         composable(Route.MyRecipesScreen.title) {
             onRouteChanged(Route.MyRecipesScreen)
@@ -169,7 +209,8 @@ fun MainNavHost(
                 onNavigateToRecipeDetailScreen = { recipe ->
                     val recipeJson = Uri.encode(Json.encodeToString(recipe))
                     navController.navigate("${Route.RecipeDetailScreen.title}/${recipeJson}")
-                }
+                },
+                padding = paddingValues
             )
         }
 

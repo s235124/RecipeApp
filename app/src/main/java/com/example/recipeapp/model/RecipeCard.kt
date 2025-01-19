@@ -1,5 +1,7 @@
 package com.example.recipeapp.model
 
+
+
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -24,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.recipeapp.R
 import com.example.recipeapp.data.Recipe
+
 
 @Composable
 fun RecipeCard(
