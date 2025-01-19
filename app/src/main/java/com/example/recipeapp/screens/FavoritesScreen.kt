@@ -1,132 +1,95 @@
 package com.example.recipeapp.screens
 
-/*
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.example.recipeapp.model.RecipeCard
-import com.example.recipeapp.model.CustomSearchBar
-import com.example.recipeapp.data.Recipe
+import com.example.recipeapp.data.RecipeItem
+import com.example.recipeapp.model.RecipeCardFromAPI
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoritesScreen(
-    onNavigateToRecipeDetailScreen: () -> Unit,
-    recipes: List<Recipe>
+    favorites: List<RecipeItem>,
+    onNavigateToRecipe: (RecipeItem) -> Unit,
+    padding : PaddingValues
 ) {
-    var searchQuery by remember { mutableStateOf("") }
-    val filteredRecipes = recipes.filter { it.name.contains(searchQuery, ignoreCase = true) }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
+    Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 0.dp)
+        ) {
+            CenterAlignedTopAppBar(
                 title = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Favorite,
-                            contentDescription = "Favorites",
-                            modifier = Modifier.padding(end = 8.dp).size(24.dp),
-                            tint = Color(0xFF78B17E)
-                        )
-                        Text(
-                            text = "Favorites",
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
+                    Text(
+                        text = "Favorites",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                },
+                navigationIcon = {
+                    Icon(
+                        imageVector = Icons.Filled.Favorite,
+                        contentDescription = "Favorites",
+                        modifier = Modifier.size(24.dp),
+                        tint = Color(0xFF78B17E)
+                    )
                 }
             )
         }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize()
-                .padding(horizontal = 16.dp)
-        ) {
-            // Updated LazyColumn with improved padding
-            LazyColumn(
-                contentPadding = PaddingValues(vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+        if (favorites.isEmpty()) {
+            // No recipes saved
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 56.dp), // avoid top bar overlap
+                contentAlignment = Alignment.Center
             ) {
-                items(filteredRecipes) { recipe ->
-                    RecipeCard(
+                Text("No recipes favorited yet.")
+            }
+        }
+        else {
+            LazyVerticalGrid (
+                columns = GridCells.Fixed(2),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 56.dp),
+                contentPadding = PaddingValues(8.dp)
+            ) {
+                items(favorites) { recipe ->
+                    RecipeCardFromAPI(
                         recipe = recipe,
-                        onNavigateToRecipeDetailScreen = onNavigateToRecipeDetailScreen
+                        onCardClick = { onNavigateToRecipe(recipe) }
                     )
                 }
             }
         }
     }
 }
-*/
 
-
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.example.recipeapp.data.Recipe
-import com.example.recipeapp.model.RecipeCard
-import com.example.recipeapp.data.RecipeItem
-import com.example.recipeapp.model.RecipeCardFromAPI
-
-
-
-@Composable
-fun FavoritesScreen(
-    favorites: List<RecipeItem>,
-    onNavigateToRecipe: (RecipeItem) -> Unit,
-) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(favorites) { recipe ->
-            RecipeCardFromAPI(
-                recipe = recipe,
-                onCardClick = {onNavigateToRecipe(recipe)},
-                modifier = Modifier
-            )
-        }
-    }
-}
 
 
 

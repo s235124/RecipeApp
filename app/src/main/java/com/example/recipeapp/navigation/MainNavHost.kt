@@ -152,7 +152,7 @@ fun MainNavHost(
                 favorites = favorites,
                 onNavigateToRecipe = { recipe: RecipeItem -> navigateToAPIRecipeDetails(navController, recipe)
                 },
-
+                padding = paddingValues
             )
         }
 
