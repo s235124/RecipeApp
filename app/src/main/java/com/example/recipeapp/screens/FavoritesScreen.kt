@@ -101,7 +101,7 @@ fun FavoritesScreen(
                         DropdownMenuItem(
                             text = {
                                 Text(
-                                    text = "Delete all recipes",
+                                    text = "Remove all recipes",
                                     color = Color.Red
                                 )
                             },
