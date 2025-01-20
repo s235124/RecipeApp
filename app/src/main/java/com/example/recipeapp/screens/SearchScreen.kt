@@ -49,7 +49,7 @@ fun SearchScreen(
     var searchQuery by remember { mutableStateOf("") }
     var filteredRecipes1 = recipes.items.filter { it.description.contains(searchQuery, ignoreCase = true) }
     var filteredRecipes2 = filteredRecipes1.filter { it.description.contains(searchQuery, ignoreCase = true) }
-    val difficulties = remember { mutableStateOf(listOf(Pair("Easy", false), Pair("More", false), Pair("hallenge", false))) }
+    val difficulties = remember { mutableStateOf(listOf(Pair("Easy", false), Pair("Effort", false), Pair("Challenge", false))) }
     val calories = remember { mutableStateOf(listOf(Pair("<200", false), Pair("200-400", false), Pair("400-600", false))) }
     val time = remember { mutableStateOf(listOf(Pair("<15 min", false), Pair("15-30 min", false), Pair(">30 min", false))) }
 
@@ -71,8 +71,8 @@ fun SearchScreen(
             if (isSelected) {
                 recipesToAdd = when (difficulty) {
                     "Easy" -> filteredRecipes1.filter { it.difficult?.contains("eas", ignoreCase = true) == true }
-                    "More" -> filteredRecipes1.filter { it.difficult?.contains(difficulty, ignoreCase = true) == true }
-                    "hallenge" -> filteredRecipes1.filter { it.difficult?.contains(difficulty, ignoreCase = true) == true }
+                    "Effort" -> filteredRecipes1.filter { it.difficult?.contains(difficulty, ignoreCase = true) == true }
+                    "Challenge" -> filteredRecipes1.filter { it.difficult?.contains(difficulty, ignoreCase = true) == true }
                     else -> emptyList()
                 }
                 timeFilter = emptyList<RecipeItem>().toMutableList()
@@ -93,6 +93,20 @@ fun SearchScreen(
                     "<200" -> difficultyFilter.filter { it.kcal != null && it.kcal < 200 }
                     "200-400" -> difficultyFilter.filter { it.kcal != null && it.kcal in 200..400 }
                     "400-600" -> difficultyFilter.filter { it.kcal != null && it.kcal in 400..600 }
+                    else -> emptyList()
+                }
+                // Add matching recipes to the calorieFilter list
+                timeFilter = emptyList<RecipeItem>().toMutableList()
+                timeFilter.addAll(recipesToAdd)
+            }
+        }
+
+        time.value.forEach { (time, isSelected) ->
+            if (isSelected) {
+                recipesToAdd = when (time) {
+                    "<15 min" -> timeFilter.filter {  (it.cookingTime ?: 0) + (it.preparationTime ?: 0) < 15 }
+                    "15-30 min" -> timeFilter.filter  {  (it.cookingTime ?: 0) + (it.preparationTime ?: 0)  in 15..30 }
+                    ">30 min" -> timeFilter.filter  {  (it.cookingTime ?: 0) + (it.preparationTime ?: 0) >30 }
                     else -> emptyList()
                 }
                 // Add matching recipes to the calorieFilter list
