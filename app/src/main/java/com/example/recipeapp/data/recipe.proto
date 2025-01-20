@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option java_package = "com.example.recipeapp.model";
+option java_multiple_files = true;
+
+message Recipe {
+    string name = 1;
+    string time = 2;
+    string difficulty = 3;
+    string calories = 4;
+    string imageUri = 5; // Nullable in Kotlin
+    int32 imageRes = 6;  // Nullable in Kotlin, default to 0
+    repeated string categories = 7; // List of categories
+}
+
+message RecipeList {
+    repeated Recipe recipes = 1;
+}
