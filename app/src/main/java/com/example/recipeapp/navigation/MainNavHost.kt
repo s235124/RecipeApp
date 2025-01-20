@@ -147,9 +147,7 @@ fun MainNavHost(
             val savedRecipes = viewModel.recipes.collectAsState().value
             val isInSavedRecipes = savedRecipes.contains(recipe)
 
-            // Immediate background and content wrapper
             Box(modifier = Modifier.fillMaxSize()) {
-                // Static background displayed immediately
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -199,20 +197,35 @@ fun MainNavHost(
             )
         }
 
-        composable("${Route.CategoryRecipesScreen.title}/{categoryId}") { backStackEntry ->
+        composable(
+            "${Route.CategoryRecipesScreen.title}/{categoryId}",
+            enterTransition = {
+                slideInHorizontally(initialOffsetX = { fullWidth -> fullWidth }) // Slide in from the right
+            },
+            popExitTransition = {
+                slideOutHorizontally(targetOffsetX = { fullWidth -> fullWidth }) // Slide out to the left
+            }
+        ) { backStackEntry ->
             onRouteChanged(Route.CategoryRecipesScreen)
             val categoryId = backStackEntry.arguments?.getString("categoryId") ?: ""
             val category = categoriesFromAPI.items.filter { categoryItem -> categoryItem.uid == categoryId }[0]
 
             val filteredRecipes = recipesFromAPI.items.filter { item -> item.categoriesIds?.contains(categoryId) == true }
 
-            CategoryRecipesScreen(
-                paddingValues = paddingValues,
-                onBackButtonClick = { navController.popBackStack() },
-                category = category,
-                onCardClick = {recipe -> navigateToAPIRecipeDetails(navController, recipe) },
-                recipes = filteredRecipes,
-            )
+            Box(modifier = Modifier.fillMaxSize()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.White) // Replace with your desired background color or image
+                )
+                CategoryRecipesScreen(
+                    paddingValues = paddingValues,
+                    onBackButtonClick = { navController.popBackStack() },
+                    category = category,
+                    onCardClick = { recipe -> navigateToAPIRecipeDetails(navController, recipe) },
+                    recipes = filteredRecipes,
+                )
+            }
         }
 
         composable(

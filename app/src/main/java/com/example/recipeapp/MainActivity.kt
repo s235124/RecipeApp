@@ -36,9 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.recipeapp.data.Category
 import com.example.recipeapp.data.CategoryAPI
-import com.example.recipeapp.data.Recipe
 import com.example.recipeapp.data.RecipeAPI
 import com.example.recipeapp.data.RecipeItem
 import com.example.recipeapp.data.getFavorites
@@ -62,8 +60,6 @@ class MainActivity : ComponentActivity() {
 
                 var recipeAPI by remember { mutableStateOf(RecipeAPI()) }
                 var categoriesAPI by remember { mutableStateOf(CategoryAPI()) }
-                var recipes by remember { mutableStateOf(emptyList<Recipe>()) }
-                var categories by remember { mutableStateOf(emptyList<Category>()) }
                 val favorites = remember { mutableStateListOf<RecipeItem>() }
                 val context = LocalContext.current
 
@@ -111,7 +107,6 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 ) { innerPadding ->
-//                    val tags = fetchData()
                     MainNavHost(
                         paddingValues = innerPadding,
                         navController = navController,
@@ -158,42 +153,6 @@ fun fetchCategoriesFromAPI(): CategoryAPI {
     else categories as CategoryAPI
 }
 
-// Simulated functions to fetch recipes and categories
-suspend fun fetchRecipes(): List<Recipe> {
-    // Replace with actual API call
-    val categories = fetchCategories() // Fetch categories with their associated recipes
-    return categories.flatMap { it.recipes } // Flatten the list of recipes from all categories
-}
-
-
-suspend fun fetchCategories(): List<Category> {
-    // Replace with actual API call
-    return listOf(
-
-        Category("Italy", R.drawable.flag_italy, recipes =  listOf(
-            Recipe("Spaghetti", "25 min", "Medium", calories = "350 kcal", imageRes = R.drawable.oip, categories = "Italy", description = "snxbdsxbs" , ingredient = listOf("sxdsxsd", "ksjdhf", "kjsdhfas"), method = listOf("Skibbidi", "Yeet")),
-            Recipe("Risotto", "40 min", "Hard", calories = "500 kcal", imageRes =  R.drawable.oip, categories = "Italy", description = "dcdcwcxw" , ingredient = listOf("sxdsxsd", "ksjdhf", "kjsdhfas"), method = listOf("Skibbidi", "Yeet") )
-        )),
-         Category("Lebanon", R.drawable.flag_lebanon, recipes =  listOf(
-        Recipe("Hummus", "15 min", "Easy", calories = "200 kcal", imageRes = R.drawable.oip, categories = "Lebanon", description = "cwhciubc", ingredient = listOf("sxdsxsd", "ksjdhf", "kjsdhfas"), method = listOf("Skibbidi", "Yeet")),
-        Recipe("Tabbouleh", "30 min", "Medium", calories = "150 kcal", imageRes = R.drawable.oip, categories =  "Lebanon", description = "hcxhwinxi", ingredient = listOf("sxdsxsd", "ksjdhf", "kjsdhfas"), method = listOf("Skibbidi", "Yeet"))
-    )),
-        Category("Pakistan", R.drawable.flag_pakistan, recipes = listOf(
-        Recipe("Biryani", "45 min", "Hard", calories = "600 kcal", imageRes = R.drawable.oip, categories = "Pakistan", description = "jxcwjkbcw", ingredient = listOf("sxdsxsd", "ksjdhf", "kjsdhfas"), method = listOf("Skibbidi", "Yeet")),
-        Recipe("Kebab", "30 min", "Medium", calories = "400 kcal", imageRes = R.drawable.oip, categories = "Pakistan", description = "jdbcjdwbckjdw", ingredient = listOf("sxdsxsd", "ksjdhf", "kjsdhfas"), method = listOf("Skibbidi", "Yeet"))
-    ))
-    )
-}
-
-//@Composable
-//fun fetchData(): CategoryAPI? {
-//    val viewModel: APITestingViewModel = viewModel() // Proper ViewModel instantiation
-//    val recipeTags by viewModel.data.collectAsState(initial = null) // Collect StateFlow
-//
-////    println(recipeTags)
-//    return recipeTags
-//}
-
 @Composable
 fun BottomBar(
     onHomeClick: () -> Unit,
@@ -204,7 +163,6 @@ fun BottomBar(
     previousTab: String?
 ) {
     val main = Route.MainScreen.title
-    val allCategory = Route.AllCategoriesScreen.title
     val myRecipes = Route.MyRecipesScreen.title
     val favorites = Route.FavouritesScreen.title
     val search = Route.SearchScreen.title
@@ -224,7 +182,7 @@ fun BottomBar(
 
         NavigationBarItem(
             icon = {
-                val icon = if (currentTab == main || currentTab == allCategory || recipeDetailScreenFromHome) Icons.Filled.Home else Icons.Outlined.Home
+                val icon = if (currentTab == main || recipeDetailScreenFromHome) Icons.Filled.Home else Icons.Outlined.Home
                 Icon(icon, contentDescription = "Home", tint = bottomcolor, modifier = Modifier.size(32.dp))
             },
             label = { Text("Home") },
