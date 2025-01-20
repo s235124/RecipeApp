@@ -1,6 +1,5 @@
 package com.example.recipeapp.model
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -99,11 +98,11 @@ fun Chips(
                     style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
                     color = Color.White, // Match the text color to the contentColor of the button
                     modifier = Modifier
-                        .padding(8.dp)
-                        .clickable { onViewAllClick() },
+                        .padding(8.dp),
                     textAlign = TextAlign.Center
                 )
             }
+            Spacer(Modifier.width(4.dp))
         }
     }
 }

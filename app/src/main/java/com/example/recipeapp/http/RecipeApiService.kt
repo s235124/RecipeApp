@@ -5,7 +5,7 @@ import com.example.recipeapp.data.CollectionAPI
 import com.example.recipeapp.data.IngredientAPI
 import com.example.recipeapp.data.RecipeAPI
 import retrofit2.http.GET
-import retrofit2.http.Query
+import retrofit2.http.Path
 
 interface RecipeApiService {
     @GET("/recipetags")
@@ -13,6 +13,9 @@ interface RecipeApiService {
 
     @GET("/categories")
     suspend fun getCategories(): CategoryAPI
+
+    @GET("/categories/{page}")
+    suspend fun getCategory(@Path("page") page: Int): CategoryAPI
 
     @GET("/collections")
     suspend fun getCollections(): CollectionAPI

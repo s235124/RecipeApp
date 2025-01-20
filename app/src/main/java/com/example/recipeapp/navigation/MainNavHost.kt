@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -21,15 +22,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.recipeapp.data.CategoryAPI
 import com.example.recipeapp.data.Recipe
-import com.example.recipeapp.data.RecipeAPI
 import com.example.recipeapp.data.RecipeItem
+import com.example.recipeapp.screens.CategoriesViewModel
 import com.example.recipeapp.screens.CategoryRecipesScreen
 import com.example.recipeapp.screens.FavoritesScreen
 import com.example.recipeapp.screens.MainScreen
 import com.example.recipeapp.screens.RecipeDetailScreen
 import com.example.recipeapp.screens.RecipeDetailsFromAPIScreen
+import com.example.recipeapp.screens.RecipeViewModel
 import com.example.recipeapp.screens.SearchScreen
 import com.example.recipeapp.screens.createmyscreen.CreateMyRecipe
 import com.example.recipeapp.screens.recipe.MyRecipeViewModel
@@ -45,10 +46,12 @@ fun MainNavHost(
     onRouteChanged: (Route) -> Unit,
     modifier: Modifier = Modifier,
     favorites: MutableList<RecipeItem>,
-    onSaveFavorites: (List<RecipeItem>) -> Unit,
-    recipesFromAPI: RecipeAPI,
-    categoriesFromAPI: CategoryAPI
+    onSaveFavorites: (List<RecipeItem>) -> Unit
 ) {
+    val recipeViewModel: RecipeViewModel = viewModel()
+    val recipesFromAPI by recipeViewModel.data.collectAsState()
+    val categoriesViewModel: CategoriesViewModel = viewModel()
+
     NavHost(
         navController = navController,
         startDestination = Route.MainScreen.title,
@@ -68,7 +71,7 @@ fun MainNavHost(
                     navController.navigate("${Route.CategoryRecipesScreen.title}/${categoryId}")
                 },
                 recipes = recipesFromAPI,
-                categories = categoriesFromAPI
+                viewModel = categoriesViewModel
             )
         }
 
@@ -199,6 +202,9 @@ fun MainNavHost(
 
         composable(
             "${Route.CategoryRecipesScreen.title}/{categoryId}",
+            popEnterTransition = {
+                slideInHorizontally(initialOffsetX = { fullWidth -> -fullWidth })
+            },
             enterTransition = {
                 slideInHorizontally(initialOffsetX = { fullWidth -> fullWidth }) // Slide in from the right
             },
@@ -208,7 +214,8 @@ fun MainNavHost(
         ) { backStackEntry ->
             onRouteChanged(Route.CategoryRecipesScreen)
             val categoryId = backStackEntry.arguments?.getString("categoryId") ?: ""
-            val category = categoriesFromAPI.items.filter { categoryItem -> categoryItem.uid == categoryId }[0]
+            val categories = categoriesViewModel.categories.collectAsState()
+            val category = categories.value.items.filter { categoryItem -> categoryItem.uid == categoryId }[0]
 
             val filteredRecipes = recipesFromAPI.items.filter { item -> item.categoriesIds?.contains(categoryId) == true }
 

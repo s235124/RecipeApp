@@ -3,38 +3,89 @@ package com.example.recipeapp.screens
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.recipeapp.data.Category
 import com.example.recipeapp.data.CategoryAPI
-import com.example.recipeapp.data.RecipeAPI
 import com.example.recipeapp.http.RetrofitInstance
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class CategoriesViewModel : ViewModel() {
-    private val _data = MutableStateFlow<CategoryAPI>(CategoryAPI())
-    val data: StateFlow<CategoryAPI> = _data
+    private val _categories = MutableStateFlow<CategoryAPI>(CategoryAPI())
+    val categories: StateFlow<CategoryAPI> = _categories
+
+    private var currentPage = 0
 
     init {
-        fetchData()
-    }
+        if (currentPage < 1) {
+            viewModelScope.launch {
+                try {
+                    val categoryPage = RetrofitInstance.api.getCategory(1)
 
-    private fun fetchData() {
-        // Launch the network call
-        viewModelScope.launch {
-            try {
-                // Fetch the data asynchronously
-                val fetchedData = RetrofitInstance.api.getCategories()
+                    Log.d("New category", "$categoryPage")
 
-                // Log the fetched data to verify the response
-                Log.d("RecipeViewModel", "Fetched categories: ${fetchedData.items.size}")
+                    val updatedItems = ArrayList(_categories.value.items)
+                    updatedItems.addAll(categoryPage.items)
 
-                // Update the StateFlow with the fetched data
-                _data.value = fetchedData
-            } catch (f: Exception) {
-                // Handle error appropriately (e.g., logging or user notification)
-                f.printStackTrace()
+                    _categories.update { currentCategories ->
+                        currentCategories.copy(items = updatedItems)
+                    }
+
+                    Log.d(
+                        "CategoriesViewModel",
+                        "Total categories: ${_categories.value.items.size}"
+                    )
+
+                    currentPage = 1  // Update current page after successful fetch
+                } catch (e: Exception) {
+                    Log.e("CategoriesViewModel", "Error fetching categories", e)
+                }
             }
         }
     }
+
+    fun getCategory(pageNum: Int) {
+        if (pageNum > currentPage) {
+            viewModelScope.launch {
+                try {
+                    val categoryPage = RetrofitInstance.api.getCategory(pageNum)
+
+                    Log.d("New category", "$categoryPage")
+
+                    val updatedItems = ArrayList(_categories.value.items)
+                    updatedItems.addAll(categoryPage.items)
+
+                    _categories.update { currentCategories ->
+                        currentCategories.copy(items = updatedItems)
+                    }
+
+                    Log.d(
+                        "CategoriesViewModel",
+                        "Total categories: ${_categories.value.items.size}"
+                    )
+
+                    currentPage = pageNum  // Update current page after successful fetch
+                } catch (e: Exception) {
+                    Log.e("CategoriesViewModel", "Error fetching categories", e)
+                }
+            }
+        }
+    }
+
+
+
+//    fun getCategory(pageNum: Int) {
+//        viewModelScope.launch {
+//            try {
+//                val categoryPage = RetrofitInstance.api.getCategory(pageNum)
+//                val currentItems = _categories.value.items
+//                if (categoryPage.items.isNotEmpty() && categoryPage.items != currentItems) {
+//                    _categories.value = CategoryAPI(items = ArrayList(currentItems + categoryPage.items))
+//                }
+//            } catch (e: Exception) {
+//                e.printStackTrace()
+//            }
+//        }
+//    }
+
 }
