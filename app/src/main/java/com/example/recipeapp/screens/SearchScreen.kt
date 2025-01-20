@@ -47,10 +47,7 @@ fun SearchScreen(
 ) {
     val iconColor = Color(0xFF8FBC8F)
     var searchQuery by remember { mutableStateOf("") }
-    var filteredRecipes1 = recipes.items.filter {
-        it.difficult?.contains('e', ignoreCase = true) == true
-    }
-
+    var filteredRecipes1 = recipes.items.filter { it.description.contains(searchQuery, ignoreCase = true) }
     var filteredRecipes2 = filteredRecipes1.filter { it.description.contains(searchQuery, ignoreCase = true) }
     val difficulties = remember { mutableStateOf(listOf(Pair("Easy", false), Pair("More", false), Pair("hallenge", false))) }
     val calories = remember { mutableStateOf(listOf(Pair("<200", false), Pair("200-400", false), Pair("400-600", false))) }
@@ -63,26 +60,44 @@ fun SearchScreen(
     fun filterRecipesByDifficulty() {
         // Start with the full list of recipes
         var difficultyFilter = filteredRecipes1
+        var calorieFilter = mutableListOf<RecipeItem>()
+        var timeFilter = mutableListOf<RecipeItem>()
+        var recipesToAdd: List<RecipeItem>
+        if (timeFilter.isEmpty())
+            timeFilter = filteredRecipes1.toMutableList()
 
         // Iterate through each difficulty and add recipes that match
         difficulties.value.forEach { (difficulty, isSelected) ->
             if (isSelected) {
-                difficultyFilter = difficultyFilter.filter { it.difficult?.contains(difficulty, ignoreCase = true) == true } as ArrayList<RecipeItem>
+                recipesToAdd = when (difficulty) {
+                    "Easy" -> filteredRecipes1.filter { it.difficult?.contains("eas", ignoreCase = true) == true }
+                    "More" -> filteredRecipes1.filter { it.difficult?.contains(difficulty, ignoreCase = true) == true }
+                    "hallenge" -> filteredRecipes1.filter { it.difficult?.contains(difficulty, ignoreCase = true) == true }
+                    else -> emptyList()
+                }
+                timeFilter = emptyList<RecipeItem>().toMutableList()
+                calorieFilter.addAll(recipesToAdd)
+                timeFilter.addAll(calorieFilter)
+                recipesToAdd = emptyList()
             }
         }
-        var calorieFilter = mutableListOf<RecipeItem>()
 
+        if (calorieFilter.isEmpty())
+            calorieFilter = filteredRecipes1.toMutableList()
         // Iterate through each selected calorie range and add recipes that match
+        difficultyFilter = calorieFilter
+
         calories.value.forEach { (calorieRange, isSelected) ->
             if (isSelected) {
-                val recipesToAdd = when (calorieRange) {
+                recipesToAdd = when (calorieRange) {
                     "<200" -> difficultyFilter.filter { it.kcal != null && it.kcal < 200 }
                     "200-400" -> difficultyFilter.filter { it.kcal != null && it.kcal in 200..400 }
                     "400-600" -> difficultyFilter.filter { it.kcal != null && it.kcal in 400..600 }
                     else -> emptyList()
                 }
                 // Add matching recipes to the calorieFilter list
-                calorieFilter.addAll(recipesToAdd)
+                timeFilter = emptyList<RecipeItem>().toMutableList()
+                timeFilter.addAll(recipesToAdd)
             }
         }
 
@@ -91,11 +106,12 @@ fun SearchScreen(
         calorieFilter = calorieFilter.distinct().toMutableList()
 
         // Update filteredRecipes1 with the new combined filtered list
-        filteredRecipes1 = calorieFilter
+        filteredRecipes1 = timeFilter
 
         // Optionally, you can update filteredRecipes2 if needed
-        filteredRecipes2 = calorieFilter
+        filteredRecipes2 = timeFilter
     }
+    filterRecipesByDifficulty()
     fun filterRecipesByCalories() {
         // Start with an empty list for the final filtered results
         var calorieFilter = mutableListOf<RecipeItem>()
@@ -123,7 +139,7 @@ fun SearchScreen(
         // Optionally, you can update filteredRecipes2 if needed
         filteredRecipes2 = calorieFilter
     }
-    filterRecipesByDifficulty()
+    //filterRecipesByDifficulty()
 
     Column(modifier = Modifier.padding(paddingValues)) {
         CenterAlignedTopAppBar(
