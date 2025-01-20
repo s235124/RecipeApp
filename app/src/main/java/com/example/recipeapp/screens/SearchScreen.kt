@@ -47,16 +47,83 @@ fun SearchScreen(
 ) {
     val iconColor = Color(0xFF8FBC8F)
     var searchQuery by remember { mutableStateOf("") }
-    val filteredRecipes1 = recipes.items.filter { it.description.contains(searchQuery, ignoreCase = true) }
+    var filteredRecipes1 = recipes.items.filter {
+        it.difficult?.contains('e', ignoreCase = true) == true
+    }
 
-    val filteredRecipes2 = filteredRecipes1.filter { it.description.contains(searchQuery, ignoreCase = true) }
-    val difficulties = listOf("Easy", "Medium", "Hard")
-    val calories = listOf("<200", "200-400", "400-600")
-    val time = listOf("<15 min", "15-30 min", ">30 min")
-    val selectedDifficulties = remember { mutableStateOf(mutableSetOf<String>()) }
+    var filteredRecipes2 = filteredRecipes1.filter { it.description.contains(searchQuery, ignoreCase = true) }
+    val difficulties = remember { mutableStateOf(listOf(Pair("Easy", false), Pair("More", false), Pair("hallenge", false))) }
+    val calories = remember { mutableStateOf(listOf(Pair("<200", false), Pair("200-400", false), Pair("400-600", false))) }
+    val time = remember { mutableStateOf(listOf(Pair("<15 min", false), Pair("15-30 min", false), Pair(">30 min", false))) }
+
+    //val selectedDifficulties = remember { mutableStateOf(mutableSetOf<String>()) }
     var showFilters by remember { mutableStateOf(false) }
-    val checkedStates = remember { mutableStateOf(difficulties.associateWith { false }.toMutableMap()) }
+    //val checkedStates = remember { mutableStateOf(difficulties.associateWith { false }.toMutableMap()) }
 
+    fun filterRecipesByDifficulty() {
+        // Start with the full list of recipes
+        var difficultyFilter = filteredRecipes1
+
+        // Iterate through each difficulty and add recipes that match
+        difficulties.value.forEach { (difficulty, isSelected) ->
+            if (isSelected) {
+                difficultyFilter = difficultyFilter.filter { it.difficult?.contains(difficulty, ignoreCase = true) == true } as ArrayList<RecipeItem>
+            }
+        }
+        var calorieFilter = mutableListOf<RecipeItem>()
+
+        // Iterate through each selected calorie range and add recipes that match
+        calories.value.forEach { (calorieRange, isSelected) ->
+            if (isSelected) {
+                val recipesToAdd = when (calorieRange) {
+                    "<200" -> difficultyFilter.filter { it.kcal != null && it.kcal < 200 }
+                    "200-400" -> difficultyFilter.filter { it.kcal != null && it.kcal in 200..400 }
+                    "400-600" -> difficultyFilter.filter { it.kcal != null && it.kcal in 400..600 }
+                    else -> emptyList()
+                }
+                // Add matching recipes to the calorieFilter list
+                calorieFilter.addAll(recipesToAdd)
+            }
+        }
+
+        // Update filteredRecipes1 with the new filtered list
+        // Remove duplicates (if any) after combining the lists
+        calorieFilter = calorieFilter.distinct().toMutableList()
+
+        // Update filteredRecipes1 with the new combined filtered list
+        filteredRecipes1 = calorieFilter
+
+        // Optionally, you can update filteredRecipes2 if needed
+        filteredRecipes2 = calorieFilter
+    }
+    fun filterRecipesByCalories() {
+        // Start with an empty list for the final filtered results
+        var calorieFilter = mutableListOf<RecipeItem>()
+
+        // Iterate through each selected calorie range and add recipes that match
+        calories.value.forEach { (calorieRange, isSelected) ->
+            if (isSelected) {
+                val recipesToAdd = when (calorieRange) {
+                    "<200" -> filteredRecipes1.filter { it.kcal != null && it.kcal < 200 }
+                    "200-400" -> filteredRecipes1.filter { it.kcal != null && it.kcal in 200..400 }
+                    "400-600" -> filteredRecipes1.filter { it.kcal != null && it.kcal in 400..600 }
+                    else -> emptyList()
+                }
+                // Add matching recipes to the calorieFilter list
+                calorieFilter.addAll(recipesToAdd)
+            }
+        }
+
+        // Remove duplicates (if any) after combining the lists
+        calorieFilter = calorieFilter.distinct().toMutableList()
+
+        // Update filteredRecipes1 with the new combined filtered list
+        filteredRecipes1 = calorieFilter
+
+        // Optionally, you can update filteredRecipes2 if needed
+        filteredRecipes2 = calorieFilter
+    }
+    filterRecipesByDifficulty()
 
     Column(modifier = Modifier.padding(paddingValues)) {
         CenterAlignedTopAppBar(
@@ -115,9 +182,9 @@ fun SearchScreen(
 
         // Filters Section
         if (showFilters) {
-            CheckboxWithDifficulties(filterList = difficulties, filterName = "Time", checkedStates = checkedStates)
-            CheckboxWithDifficulties(filterList = calories, filterName = "Time", checkedStates = checkedStates)
-            CheckboxWithDifficulties(filterList = time, filterName = "Time", checkedStates = checkedStates)
+            CheckboxWithDifficulties(filterList = difficulties, filterName = "Time")
+            CheckboxWithDifficulties(filterList = calories, filterName = "Time")
+            CheckboxWithDifficulties(filterList = time, filterName = "Time")
 
         }
         // Display filtered recipes
@@ -142,16 +209,17 @@ fun SearchScreen(
 
 @Composable
 fun CheckboxWithDifficulties(
-    filterList: List<String>, filterName: String,
-    checkedStates: MutableState<MutableMap<String, Boolean>>
+    filterList: MutableState<List<Pair<String, Boolean>>>, filterName: String
 ) {
+
+
     // State to track the checked state of each difficulty
 
-    Text(
-        text = filterName+": ${
-            checkedStates.value.filterValues { it }.keys.joinToString(", ")
-        }",
-    )
+    //Text(
+        //text = filterName+": ${
+            //filterList.value.filterValues { it }.keys.joinToString(", ")
+        //}",
+    //)
     Column {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -159,26 +227,21 @@ fun CheckboxWithDifficulties(
             modifier = Modifier.fillMaxWidth().padding(8.dp) // Add padding for the entire row
         ) {
             // for each filter, create a checkbox
-            filterList.forEach { filter ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+            filterList.value.forEachIndexed { index, (difficulty, isSelected) ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
-                        checked = checkedStates.value[filter] ?: false,
+                        checked = isSelected,
                         onCheckedChange = { isChecked ->
-                            checkedStates.value = checkedStates.value.toMutableMap().apply {
-                                this[filter] = isChecked //
+                            // Update the state with the new checked value
+                            filterList.value = filterList.value.toMutableList().apply {
+                                this[index] = this[index].copy(second = isChecked)
                             }
+
                         }
                     )
-                    Text(
-                        text = filter,
-                        modifier = Modifier.padding(start = 8.dp) // Space between checkbox and text
-                    )
+                    Text(difficulty, modifier = Modifier.padding(start = 8.dp))
                 }
             }
         }
-
     }
 }
-
