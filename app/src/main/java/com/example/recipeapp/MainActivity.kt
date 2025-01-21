@@ -21,30 +21,22 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.recipeapp.data.CategoryAPI
-import com.example.recipeapp.data.RecipeAPI
 import com.example.recipeapp.data.RecipeItem
 import com.example.recipeapp.data.getFavorites
 import com.example.recipeapp.data.saveFavorites
 import com.example.recipeapp.navigation.MainNavHost
 import com.example.recipeapp.navigation.Route
-import com.example.recipeapp.screens.CategoriesViewModel
-import com.example.recipeapp.screens.RecipeViewModel
 import com.example.recipeapp.ui.theme.RecipeAppTheme
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -58,8 +50,6 @@ class MainActivity : ComponentActivity() {
                 // Fetch the recipes only once and share it across screens
                 val coroutineScope = rememberCoroutineScope()
 
-                var recipeAPI by remember { mutableStateOf(RecipeAPI()) }
-                var categoriesAPI by remember { mutableStateOf(CategoryAPI()) }
                 val favorites = remember { mutableStateListOf<RecipeItem>() }
                 val context = LocalContext.current
 
@@ -67,9 +57,6 @@ class MainActivity : ComponentActivity() {
                 val previousTab = navController.previousBackStackEntry?.destination?.route
                 val currentBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = currentBackStackEntry?.destination?.route
-
-                recipeAPI = fetchRecipesFromAPI()
-                categoriesAPI = fetchCategoriesFromAPI()
 
                 // Fetch recipes on startup
                 LaunchedEffect(Unit) {
@@ -116,8 +103,6 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(innerPadding),
-                        recipesFromAPI = recipeAPI,
-                        categoriesFromAPI = categoriesAPI,
                         favorites = favorites,
                         onSaveFavorites = { updatedFavorite ->
                             coroutineScope.launch {
@@ -129,28 +114,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
-
-@Composable
-fun fetchRecipesFromAPI(): RecipeAPI {
-    val viewModel: RecipeViewModel = viewModel() // Proper ViewModel instantiation
-    val recipes by viewModel.data.collectAsState(initial = null) // Collect StateFlow
-
-    println(recipes)
-
-    return if (recipes == null) RecipeAPI()
-    else recipes as RecipeAPI
-}
-
-@Composable
-fun fetchCategoriesFromAPI(): CategoryAPI {
-    val viewModel: CategoriesViewModel = viewModel() // Proper ViewModel instantiation
-    val categories by viewModel.data.collectAsState(initial = null) // Collect StateFlow
-
-    println(categories)
-
-    return if (categories == null) CategoryAPI()
-    else categories as CategoryAPI
 }
 
 @Composable
