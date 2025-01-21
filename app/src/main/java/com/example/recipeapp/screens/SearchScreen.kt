@@ -1,18 +1,24 @@
 package com.example.recipeapp.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -45,6 +51,12 @@ fun SearchScreen(
     onCardClick: (RecipeItem) -> Unit,
     recipes: RecipeAPI
 ) {
+    val buttonColors = ButtonDefaults.buttonColors(
+        containerColor = Color(0xFF78B17E),
+        contentColor = Color.White,
+        disabledContentColor = Color(0xFFB0BEC5)
+    )
+
     val iconColor = Color(0xFF8FBC8F)
     var searchQuery by remember { mutableStateOf("") }
     var filteredRecipes1 = recipes.items.filter { it.description.contains(searchQuery, ignoreCase = true) }
@@ -57,9 +69,9 @@ fun SearchScreen(
 
     fun filterRecipesByDifficulty() {
         // Start with the full list of recipes
-        var difficultyFilter: List<RecipeItem>
+        val difficultyFilter: List<RecipeItem>
         var calorieFilter = mutableListOf<RecipeItem>()
-        var timeFilter = mutableListOf<RecipeItem>()
+        var timeFilter: MutableList<RecipeItem>
         var recipesToAdd: List<RecipeItem>
         timeFilter = filteredRecipes1.toMutableList()
         // first we check for any difficulty filters
@@ -147,11 +159,11 @@ fun SearchScreen(
             }
         )
 
-        androidx.compose.foundation.layout.Row(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically
         ) {
             // Search Bar
             OutlinedTextField(
@@ -166,15 +178,16 @@ fun SearchScreen(
                 },
                 modifier = Modifier
                     .weight(1f)
-                    .padding(end = 8.dp)
+//                    .padding(end = 8.dp)
             )
 
             // Filter Button
-            androidx.compose.material3.Button(
+            Button(
                 onClick = { showFilters = !showFilters },
+                colors = buttonColors,
                 modifier = Modifier.padding(start = 8.dp)
             ) {
-                Text(if (showFilters) "Hide Filters" else "Filter")
+                Text(if (showFilters) "Hide" else "Filter", modifier = Modifier.width(32.dp))
             }
         }
 
@@ -213,10 +226,16 @@ fun CheckboxWithDifficulties(
 
     // State to track the checked state of each difficulty
 
-    Text(
-        text = filterName+":",
-    )
-    Column {
+    Column(
+        modifier = Modifier.background(Color.LightGray).padding(top = 6.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = filterName,
+            fontStyle = FontStyle.Italic,
+            fontSize = 24.sp
+        )
+        Spacer(Modifier.height(6.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp), // Space between checkboxes
