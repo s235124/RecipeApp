@@ -180,6 +180,7 @@ fun MainNavHost(
                 },
                 onRemoveAllFavorites = {
                     favorites.clear()
+                    onSaveFavorites(favorites)
                 },
                 padding = paddingValues
             )
