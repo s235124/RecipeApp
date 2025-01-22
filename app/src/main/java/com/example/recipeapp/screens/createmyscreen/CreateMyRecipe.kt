@@ -127,7 +127,7 @@ fun CreateMyRecipe(
     //---------------------------
 
     Box (
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.ime)
     ) {
         LazyColumn(
             modifier = Modifier
@@ -136,8 +136,7 @@ fun CreateMyRecipe(
                     bottom = paddingValues.calculateBottomPadding(),
                     start = 16.dp,
                     end = 16.dp
-                )
-                .windowInsetsPadding(WindowInsets.ime),
+                ),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
