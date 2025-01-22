@@ -126,7 +126,7 @@ fun MyRecipesScreen(
                     // Dropdown Menu
                     DropdownMenu(
                         expanded = expanded,
-                        onDismissRequest = { expanded = false }
+                        onDismissRequest = { expanded = false },
                     ) {
                         DropdownMenuItem(
                             text = {
@@ -138,7 +138,8 @@ fun MyRecipesScreen(
                             onClick = {
                                 expanded = false
                                 deleteAllDialog = true
-                            }
+                            },
+                            enabled = savedRecipes.isNotEmpty()
                         )
                     }
                 },

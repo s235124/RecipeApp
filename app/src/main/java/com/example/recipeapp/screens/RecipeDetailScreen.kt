@@ -151,12 +151,14 @@ fun RecipeDetailScreen(
                 var i = 1
                 for (step in recipe.method) {
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "Step $i",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
+                    if (recipe.method.size > 1) {
+                        Text(
+                            text = "Step $i",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                        )
+                    }
 
                     Text(
                         text = step.replace("�", "% "),

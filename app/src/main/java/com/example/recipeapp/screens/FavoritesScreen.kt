@@ -108,7 +108,8 @@ fun FavoritesScreen(
                             onClick = {
                                 expanded = false
                                 removeAllDialog = true
-                            }
+                            },
+                            enabled = favorites.isNotEmpty()
                         )
                     }
                 }
