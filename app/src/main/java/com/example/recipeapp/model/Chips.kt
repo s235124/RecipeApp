@@ -72,6 +72,7 @@ fun Chips(
                 .horizontalScroll(rememberScrollState()),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            Spacer(Modifier.width(8.dp))
             var i = 0
             categoryRecipes.forEach { recipe ->
                 if (i >= 5) return@forEach
