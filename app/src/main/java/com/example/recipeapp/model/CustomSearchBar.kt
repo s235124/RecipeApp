@@ -36,12 +36,6 @@ fun CustomSearchBar(
             value = searchQuery,
             onValueChange = { query ->
                 onSearchQueryChange(query)
-
-                // If showNavigation is true, navigate to search screen on query change
-                if (showNavigation && query.isNotEmpty()) {
-
-                }
-
             },
             placeholder = {
                 Text(text = "Search for your wished recipes or categories")
@@ -57,12 +51,7 @@ fun CustomSearchBar(
                 .weight(1f)
                 .height(56.dp)
                 .shadow(elevation = 20.dp, RoundedCornerShape(10.dp), clip = true),
-            shape = RoundedCornerShape(24.dp),
-            /*colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color.Gray,
-                unfocusedBorderColor = Color.Gray,
-                cursorColor = Color(0xFF78B17E)
-            )*/
+            shape = RoundedCornerShape(24.dp)
         )
     }
 }

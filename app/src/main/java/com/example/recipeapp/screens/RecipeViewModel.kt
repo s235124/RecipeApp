@@ -3,7 +3,6 @@ package com.example.recipeapp.screens
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.recipeapp.data.CategoryAPI
 import com.example.recipeapp.data.RecipeAPI
 import com.example.recipeapp.http.RetrofitInstance
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,7 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class RecipeViewModel : ViewModel() {
-    private val _data = MutableStateFlow<RecipeAPI>(RecipeAPI())
+    private val _data = MutableStateFlow(RecipeAPI())
     val data: StateFlow<RecipeAPI> = _data
 
     init {

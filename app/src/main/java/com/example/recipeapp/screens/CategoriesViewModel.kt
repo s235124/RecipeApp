@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class CategoriesViewModel : ViewModel() {
-    private val _categories = MutableStateFlow<CategoryAPI>(CategoryAPI())
+    private val _categories = MutableStateFlow(CategoryAPI())
     val categories: StateFlow<CategoryAPI> = _categories
 
     private var currentPage = 0

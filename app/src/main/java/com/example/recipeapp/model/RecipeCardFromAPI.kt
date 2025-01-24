@@ -23,8 +23,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.example.recipeapp.data.RecipeAPI
 import com.example.recipeapp.data.RecipeItem
+
 @Composable
 fun RecipeCardFromAPI(
     recipe: RecipeItem,

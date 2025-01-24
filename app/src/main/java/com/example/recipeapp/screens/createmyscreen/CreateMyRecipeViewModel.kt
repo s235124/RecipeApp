@@ -6,18 +6,16 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.recipeapp.data.Recipe
-import com.example.recipeapp.data.getImageUri
 import com.example.recipeapp.data.getMyRecipes
 import com.example.recipeapp.data.saveMyRecipes
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.io.File
 
 
-class CreateMyRecipeViewModel(val context: Context) : ViewModel() {
+class CreateMyRecipeViewModel(private val context: Context) : ViewModel() {
 
 
 
@@ -25,15 +23,10 @@ class CreateMyRecipeViewModel(val context: Context) : ViewModel() {
     private val _recipes = MutableStateFlow<List<Recipe>>(emptyList())
     val recipes: StateFlow<List<Recipe>> get() = _recipes
 
-
-    private val _imageUriFlow = MutableStateFlow<String?>(null)
-
     init {
         viewModelScope.launch {
             try {
                 _recipes.value = getMyRecipes(context).first()
-                val savedUri = getImageUri(context).firstOrNull()
-                _imageUriFlow.value = savedUri
             } catch (e: Exception) {
 
                 _recipes.value = emptyList()

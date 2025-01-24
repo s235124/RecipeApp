@@ -20,7 +20,7 @@ val Context.dataStore by preferencesDataStore(name = "recipe_data_store")
 val IMAGE_URI_KEY = stringPreferencesKey("image_uri")
 
 val Context.MyfavoriteRecipeDataStore: DataStore<Preferences> by preferencesDataStore(name = "favorites")
-val FAVORITES_KEY = stringPreferencesKey("favorite_personas")
+val FAVORITES_KEY = stringPreferencesKey("favorite_recipes")
 
 
 
@@ -70,24 +70,3 @@ fun getFavorites(context: Context): Flow<List<RecipeItem>> {
             if (jsonString.isNotEmpty()) Json.decodeFromString(jsonString) else emptyList()
         }
 }
-
-// Save Image URI
-suspend fun saveImageUriToDataStore(context: Context, uri: String) {
-    context.dataStore.edit { preferences ->
-        preferences[IMAGE_URI_KEY] = uri
-    }
-}
-
-// Retrieve Image URI
-fun getImageUri(context: Context): Flow<String?> {
-    return context.dataStore.data.map { preferences ->
-        preferences[IMAGE_URI_KEY]
-    }
-}
-
-
-
-
-
-
-
