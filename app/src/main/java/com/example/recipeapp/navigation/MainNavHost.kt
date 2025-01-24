@@ -154,7 +154,7 @@ fun MainNavHost(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color.White) // Replace with your desired background color or image
+                        .background(Color.White)
                 )
                 RecipeDetailScreen(
                     innerPadding = paddingValues,
@@ -224,7 +224,7 @@ fun MainNavHost(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color.White) // Replace with your desired background color or image
+                        .background(Color.White)
                 )
                 CategoryRecipesScreen(
                     paddingValues = paddingValues,
@@ -252,7 +252,7 @@ fun MainNavHost(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color.White) // Replace with your desired background color or image
+                        .background(Color.White)
                 )
                 CreateMyRecipe(
                     paddingValues = paddingValues,

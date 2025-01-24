@@ -89,9 +89,9 @@ fun Chips(
                 onClick = onViewAllClick,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF78B17E), // Lighter green color
-                    contentColor = Color.White,   // Darker green for text
-                    disabledContainerColor = Color(0xFFE8F5E9), // Optional: Lighter green for disabled state
-                    disabledContentColor = Color(0xFFB0BEC5)    // Optional: Grayish text for disabled state
+                    contentColor = Color.White,
+                    disabledContainerColor = Color(0xFFE8F5E9),
+                    disabledContentColor = Color(0xFFB0BEC5)
                 )
             ) {
                 Text(

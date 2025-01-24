@@ -67,13 +67,13 @@ fun SearchScreen(
 
     var showFilters by remember { mutableStateOf(false) }
 
-    fun filterRecipesByDifficulty() {
-        // Start with the full list of recipes
-        val difficultyFilter: List<RecipeItem>
-        var calorieFilter = mutableListOf<RecipeItem>()
-        var timeFilter: MutableList<RecipeItem>
+    fun filterRecipesByFilter() {
+
+        var tempFilter = mutableListOf<RecipeItem>()
+        var finalFilter: MutableList<RecipeItem>
         var recipesToAdd: List<RecipeItem>
-        timeFilter = filteredRecipes1.toMutableList()
+        // Start with the full list of recipes
+        finalFilter = filteredRecipes1.toMutableList()
         // first we check for any difficulty filters
         // Iterate through each difficulty and add recipes that match
         difficulties.value.forEach { (difficulty, isSelected) ->
@@ -86,29 +86,29 @@ fun SearchScreen(
                     else -> emptyList() //if no recipes found recipesToAdd is empty
 
                 }
-                timeFilter = emptyList<RecipeItem>().toMutableList() //if any difficulties were chosen, we empty timefilter, such that we only add the filteredRecipes from above
-                calorieFilter.addAll(recipesToAdd)
-                timeFilter.addAll(calorieFilter)
+                finalFilter = emptyList<RecipeItem>().toMutableList() //if any difficulties were chosen, we empty timefilter, such that we only add the filteredRecipes from above
+                tempFilter.addAll(recipesToAdd)
+                finalFilter.addAll(tempFilter)
                 recipesToAdd = emptyList() // we empty recipesToAdd for the next cycle
             }
         }
 
-        if (calorieFilter.isEmpty())
-            calorieFilter = filteredRecipes1.toMutableList()
+        if (tempFilter.isEmpty())
+            tempFilter = filteredRecipes1.toMutableList()
 
-        difficultyFilter = calorieFilter // we assign difficultyfilter to equate caloriefilter such that the next cycle only looks at the recipes we have so far
+
 
         calories.value.forEach { (calorieRange, isSelected) ->
             if (isSelected) {
                 recipesToAdd = when (calorieRange) {
-                    "<200" -> difficultyFilter.filter { it.kcal != null && it.kcal < 200 }
-                    "200-400" -> difficultyFilter.filter { it.kcal != null && it.kcal in 200..400 }
-                    "400-600" -> difficultyFilter.filter { it.kcal != null && it.kcal in 400..600 }
+                    "<200" -> tempFilter.filter { it.kcal != null && it.kcal < 200 }
+                    "200-400" -> tempFilter.filter { it.kcal != null && it.kcal in 200..400 }
+                    "400-600" -> tempFilter.filter { it.kcal != null && it.kcal in 400..600 }
                     else -> emptyList()
                 }
 
-                timeFilter = emptyList<RecipeItem>().toMutableList() //empty timefilter first then we add the newly filtered recipes
-                timeFilter.addAll(recipesToAdd)
+                finalFilter = emptyList<RecipeItem>().toMutableList() //empty timefilter first then we add the newly filtered recipes
+                finalFilter.addAll(recipesToAdd)
             }
         }
 
@@ -116,24 +116,24 @@ fun SearchScreen(
             if (isSelected) {
                 recipesToAdd = when (time) {
                     //we add cooking time with preparation time and then filter
-                    "<15 min" -> timeFilter.filter {  (it.cookingTime ?: 0) + (it.preparationTime ?: 0) < 15 }
-                    "15-30 min" -> timeFilter.filter  {  (it.cookingTime ?: 0) + (it.preparationTime ?: 0)  in 15..30 }
-                    ">30 min" -> timeFilter.filter  {  (it.cookingTime ?: 0) + (it.preparationTime ?: 0) >30 }
+                    "<15 min" -> finalFilter.filter {  (it.cookingTime ?: 0) + (it.preparationTime ?: 0) < 15 }
+                    "15-30 min" -> finalFilter.filter  {  (it.cookingTime ?: 0) + (it.preparationTime ?: 0)  in 15..30 }
+                    ">30 min" -> finalFilter.filter  {  (it.cookingTime ?: 0) + (it.preparationTime ?: 0) >30 }
                     else -> emptyList()
                 }
                 // rinse and repeat
-                timeFilter = emptyList<RecipeItem>().toMutableList()
-                timeFilter.addAll(recipesToAdd)
+                finalFilter = emptyList<RecipeItem>().toMutableList()
+                finalFilter.addAll(recipesToAdd)
             }
         }
 
 
-        // Update filteredRecipes1 with the new combined filtered list
-        filteredRecipes1 = timeFilter
+        // Update filteredRecipes1
+        filteredRecipes1 = finalFilter
 
-        filteredRecipes2 = timeFilter
+        filteredRecipes2 = finalFilter
     }
-    filterRecipesByDifficulty()
+    filterRecipesByFilter()
 
     Column(modifier = Modifier.padding(paddingValues)) {
         CenterAlignedTopAppBar(
@@ -224,8 +224,6 @@ fun CheckboxWithDifficulties(
 ) {
 
 
-    // State to track the checked state of each difficulty
-
     Column(
         modifier = Modifier.background(Color.LightGray).padding(top = 6.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -241,7 +239,7 @@ fun CheckboxWithDifficulties(
             horizontalArrangement = Arrangement.spacedBy(16.dp), // Space between checkboxes
             modifier = Modifier.fillMaxWidth().padding(8.dp) // Add padding for the entire row
         ) {
-            // for each filter, create a checkbox
+            // for each filter, create a checkbox, chat-gpt made the forEachIndexed loop
             filterList.value.forEachIndexed { index, (difficulty, isSelected) ->
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(

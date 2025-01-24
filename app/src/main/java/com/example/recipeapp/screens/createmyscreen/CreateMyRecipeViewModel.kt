@@ -29,10 +29,6 @@ class CreateMyRecipeViewModel(val context: Context) : ViewModel() {
 
 
     private val _imageUriFlow = MutableStateFlow<String?>(null)
-    val imageUriFlow = _imageUriFlow.asStateFlow() // Expose as read-only
-
-
-
 
     init {
         viewModelScope.launch {
@@ -41,7 +37,7 @@ class CreateMyRecipeViewModel(val context: Context) : ViewModel() {
                 val savedUri = getImageUri(context).firstOrNull()
                 _imageUriFlow.value = savedUri
             } catch (e: Exception) {
-                // Handle error gracefully (e.g., log error, show fallback UI)
+
                 _recipes.value = emptyList()
                 e.printStackTrace()
             }
@@ -56,23 +52,17 @@ class CreateMyRecipeViewModel(val context: Context) : ViewModel() {
                 val updatedRecipes = _recipes.value.toMutableList().apply { add(recipe) }
                 // Save the updated list to DataStore
                 saveMyRecipes(context, updatedRecipes)
-                // Update the in-memory state only after saving
+                // update memory
                 _recipes.value = updatedRecipes
-                Log.d("com.example.recipeapp.screens.createmyscreen.CreateMyRecipeViewModel", "Recipe saved: $updatedRecipes")
+                Log.d("create my recipe", "Recipe saved: $updatedRecipes")
             } catch (e: Exception) {
-                // Log or handle errors (optional)
-                Log.e("com.example.recipeapp.screens.createmyscreen.CreateMyRecipeViewModel", "Error saving recipe: ${e.message}")
+                // error log
+                Log.e("create my recipe", "Error saving recipe: ${e.message}")
                 e.printStackTrace()
             }
         }
     }
 
-    fun saveImageUri(uri: String) {
-        viewModelScope.launch {
-            saveImageUriToDataStore(context, uri)// Save to DataStore
-            _imageUriFlow.value = uri // Update StateFlow
-        }
-    }
 
     fun copyImageToAppStorage(context: Context, sourceUri: Uri): Uri? {
         return try {
